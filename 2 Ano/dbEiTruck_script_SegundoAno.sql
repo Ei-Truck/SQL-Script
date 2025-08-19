@@ -4,10 +4,10 @@ BEGIN;
 -- DROPS
 -- =============================
 
-drop table if exists tb_midia_ocorrencia cascade;
+drop table if exists tb_midia_infracao cascade;
 drop table if exists tb_registro cascade;
-drop table if exists tb_ocorrencia cascade;
-drop table if exists tb_tipo_ocorrencia cascade;
+drop table if exists tb_infracao cascade;
+drop table if exists tb_tipo_infracao cascade;
 drop table if exists tb_usuario cascade;
 drop table if exists tb_cargo cascade;
 drop table if exists tb_viagem cascade;
@@ -18,7 +18,6 @@ drop table if exists tb_tipo_risco cascade;
 drop table if exists tb_unidade cascade;
 drop table if exists tb_segmento cascade;
 drop table if exists tb_status cascade;
-drop table if exists tb_decisao cascade;
 drop table if exists lg_login_usuario cascade;
 drop view if exists vw_relatorio_simples_viagem;
 drop view if exists vw_visao_basica_viagem;
@@ -33,10 +32,11 @@ CREATE TABLE tb_status (
     isinactive BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE tb_tipo_ocorrencia (
+CREATE TABLE tb_tipo_infracao (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
     pontuacao  INTEGER NOT NULL,
+    id_tipo_gravidade INTEGER REFERENCES tb_tipo_gravidade,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -50,6 +50,12 @@ CREATE TABLE tb_tipo_risco (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
     descricao  TEXT,
+    isinactive BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE tb_tipo_gravidade (
+    id         INTEGER PRIMARY KEY,
+    nome       VARCHAR(50) NOT NULL UNIQUE,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -90,6 +96,7 @@ CREATE TABLE tb_usuario (
     nome_completo  VARCHAR(150) NOT NULL,
     email          VARCHAR(150) NOT NULL UNIQUE,
     hash_senha     VARCHAR(100) NOT NULL,
+    url_foto       VARCHAR(255) DEFAULT 'Sem foto',
     id_status      INTEGER REFERENCES tb_status,
     id_cargo       INTEGER NOT NULL REFERENCES tb_cargo,
     isinactive     BOOLEAN DEFAULT FALSE
@@ -123,18 +130,9 @@ CREATE TABLE tb_motorista (
     telefone      VARCHAR(15) NOT NULL,
     email_empresa VARCHAR(150),
     risco         INTEGER REFERENCES tb_tipo_risco,
+    url_foto      VARCHAR(255) DEFAULT 'Sem foto',
     id_status     INTEGER REFERENCES tb_status,
     isinactive    BOOLEAN DEFAULT FALSE
-);
-
--- =============================
--- DECISÃO
--- =============================
-CREATE TABLE tb_decisao (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(50) NOT NULL UNIQUE,
-    descricao  TEXT,
-    isinactive BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -148,22 +146,22 @@ CREATE TABLE tb_viagem (
     id_destino   INTEGER REFERENCES tb_localidade,
     dt_hr_inicio TIMESTAMP,
     dt_hr_fim    TIMESTAMP,
-    id_decisao   INTEGER REFERENCES tb_decisao,
-    tratativa    VARCHAR(255),
+    tratativa    TEXT,
+    km_viagem    VARCHAR DEFAULT 'Não informado'
     isinactive   BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
 -- OCORRÊNCIA
 -- =============================
-CREATE TABLE tb_ocorrencia (
+CREATE TABLE tb_infracao (
     id                 SERIAL PRIMARY KEY,
     id_viagem          INTEGER REFERENCES tb_viagem,
     id_caminhao        INTEGER NOT NULL REFERENCES tb_caminhao,
     id_motorista       INTEGER NOT NULL REFERENCES tb_motorista,
     id_usuario         INTEGER REFERENCES tb_usuario,
     dt_hr_evento       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    id_tipo_ocorrencia INTEGER REFERENCES tb_tipo_ocorrencia,
+    id_tipo_infracao   INTEGER REFERENCES tb_tipo_infracao,
     latitude           NUMERIC(9, 7),
     longitude          NUMERIC(9, 7),
     velocidade_kmh     NUMERIC(5, 2),
@@ -173,9 +171,9 @@ CREATE TABLE tb_ocorrencia (
 -- =============================
 -- MÍDIA DE OCORRÊNCIA
 -- =============================
-CREATE TABLE tb_midia_ocorrencia (
+CREATE TABLE tb_midia_infracao (
     id             SERIAL PRIMARY KEY,
-    id_ocorrencia  INTEGER NOT NULL REFERENCES tb_ocorrencia,
+    id_infracao  INTEGER NOT NULL REFERENCES tb_infracao,
     arquivo        VARCHAR(250) NOT NULL,
     duracao_clipe  NUMERIC(6, 2),
     dt_hr_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -210,18 +208,22 @@ INSERT INTO tb_status (id, nome, isinactive) VALUES
 (9, 'Pendente', false),
 (10, 'Suspenso', true);
 
+INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
+(1,'Não informado',false)
+
 -- 2) TIPO_OCORRENCIA
-INSERT INTO tb_tipo_ocorrencia (id, nome, pontuacao, isinactive) VALUES
-(1, 'Excesso de velocidade', 5, false),
-(2, 'Frenagem brusca', 3, false),
-(3, 'Aceleração brusca', 3, false),
-(4, 'Colisão', 10, false),
-(5, 'Pane mecânica', 6, false),
-(6, 'Desvio de rota', 4, true),
-(7, 'Falha de comunicação', 2, false),
-(8, 'Carga violada', 8, false),
-(9, 'Parada não autorizada', 4, false),
-(10, 'Uso não autorizado', 7, true);
+INSERT INTO tb_tipo_infracao (id, nome, pontuacao,id_tipo_gravidade, isinactive) VALUES
+(1, 'Excesso de velocidade', 5,1, false),
+(2, 'Frenagem brusca', 3,1, false),
+(3, 'Aceleração brusca', 3,1, false),
+(4, 'Colisão', 10,1, false),
+(5, 'Pane mecânica', 6,1, false),
+(6, 'Desvio de rota', 4,1, true),
+(7, 'Falha de comunicação', 2,1, false),
+(8, 'Carga violada', 8,1, false),
+(9, 'Parada não autorizada', 4,1, false),
+(10, 'Uso não autorizado', 7,1, true);
+
 
 -- 3) LOCALIDADE
 INSERT INTO tb_localidade (id, nome, isinactive) VALUES
@@ -327,19 +329,6 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (9, '1IWZZZ377VT004259', 9, 9, 'BRA4D55','Mercedes Axor', 2016, 109, 1, false),
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, 1, false);
 
--- 11) DECISAO (antes de VIAGEM por causa do FK)
-INSERT INTO tb_decisao (id, nome, descricao, isinactive) VALUES
-(1, 'Sem ação necessária', 'Ocorrência registrada, mas sem necessidade de ação.', false),
-(2, 'Advertência verbal', 'Motorista foi advertido verbalmente.', false),
-(3, 'Treinamento adicional', 'Motorista será encaminhado para treinamento.', false),
-(4, 'Suspensão temporária', 'Motorista suspenso temporariamente.', false),
-(5, 'Multa aplicada', 'Aplicação de multa por infração.', false),
-(6, 'Encaminhar à manutenção', 'Veículo será enviado para manutenção.', false),
-(7, 'Acionar seguro', 'Acionamento do seguro devido a sinistro.', false),
-(8, 'Encerrar ocorrência', 'Registro finalizado sem penalidades.', false),
-(9, 'Encaminhar à polícia', 'Ocorrência encaminhada para as autoridades.', false),
-(10, 'Revisão de rota', 'Alteração de rota recomendada.', false);
-
 -- 12) VIAGEM
 INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, id_decisao, tratativa, isinactive) VALUES
 (1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 1, 'Registro sem ação.', false),
@@ -354,7 +343,7 @@ INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_
 (10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00', 10, 'Rota alterada conforme recomendação.', false);
 
 -- 13) OCORRENCIA
-INSERT INTO tb_ocorrencia (id, id_viagem, id_caminhao, id_motorista, id_usuario, dt_hr_evento, id_tipo_ocorrencia, latitude, longitude, velocidade_kmh, isinactive) VALUES
+INSERT INTO tb_infracao (id, id_viagem, id_caminhao, id_motorista, id_usuario, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, isinactive) VALUES
 (1, 1, 1, 1, 1, '2023-01-10 10:15:00', 1, -23.550520, -46.633308, 95.5, false),
 (2, 2, 2, 2, 2, '2023-02-15 11:30:00', 2, -22.909938, -47.062633, 80.0, false),
 (3, 3, 3, 3, 3, '2023-03-05 13:10:00', 4, -22.906847, -43.172896, 60.0, false),
@@ -367,7 +356,7 @@ INSERT INTO tb_ocorrencia (id, id_viagem, id_caminhao, id_motorista, id_usuario,
 (10, 10, 10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0, false);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO tb_midia_ocorrencia (id, id_ocorrencia, arquivo, duracao_clipe, dt_hr_registro, isinactive) VALUES
+INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro, isinactive) VALUES
 (1, 1,  'ocorrencia1.mp4', 15.20, '2023-01-10 10:20:00', false),
 (2, 2,  'ocorrencia2.mp4', 10.00, '2023-02-15 11:40:00', false),
 (3, 3,  'ocorrencia3.mp4', 20.50, '2023-03-05 13:15:00', false),
@@ -386,7 +375,7 @@ CREATE VIEW vw_relatorio_simples_viagem (
     total_infracoes,
     placa_caminhao,
     data_inicio_viagem,
-    id_ocorrencia,
+    id_infracao,
     id_viagem,
     id_caminhao
 ) AS
@@ -394,10 +383,10 @@ SELECT
     COUNT(o.id)    AS total_infracoes,
     c.placa        AS placa_caminhao,
     v.dt_hr_inicio AS data_inicio_viagem,
-    o.id           AS id_ocorrencia,
+    o.id           AS id_infracao,
     v.id           AS id_viagem,
     c.id           AS id_caminhao
-FROM tb_ocorrencia o
+FROM tb_infracao o
 JOIN tb_viagem v   ON o.id_viagem = v.id
 JOIN tb_caminhao c ON v.id_caminhao = c.id
 GROUP BY c.placa, v.dt_hr_inicio, o.id, v.id, c.id;
@@ -412,7 +401,7 @@ CREATE VIEW vw_visao_basica_viagem (
     id_viagem,
     id_motorista,
     id_tipo_risco,
-    id_ocorrencia,
+    id_infracao,
     id_caminhao
 ) AS
 SELECT
@@ -425,12 +414,12 @@ SELECT
     v.id            AS id_viagem,
     m.id            AS id_motorista,
     tr.id           AS id_tipo_risco,
-    o.id            AS id_ocorrencia,
+    o.id            AS id_infracao,
     c.id            AS id_caminhao
 FROM tb_viagem v
 JOIN tb_motorista m ON m.id = v.id_motorista
 JOIN tb_tipo_risco tr ON tr.id = m.risco
-JOIN tb_ocorrencia o ON o.id_viagem = v.id
+JOIN tb_infracao o ON o.id_viagem = v.id
 JOIN tb_caminhao c ON c.id = v.id_caminhao
 GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, v.id, m.id, tr.id, o.id, c.id, m.nome_completo;
 
@@ -443,9 +432,9 @@ SELECT
     COUNT(o.id) AS total_ocorrencias,
     t.nome      AS nome_tipo_ocorrencia,
     v.id        AS id_viagem
-FROM tb_ocorrencia o
+FROM tb_infracao o
 JOIN tb_viagem v ON o.id_viagem = v.id
-JOIN tb_tipo_ocorrencia t ON o.id_tipo_ocorrencia = t.id
+JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id, t.nome;
 
 -- =============================
