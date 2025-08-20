@@ -1,3 +1,5 @@
+ROLLBACK;
+
 BEGIN;
 
 -- =============================
@@ -32,6 +34,12 @@ CREATE TABLE tb_status (
     isinactive BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE tb_tipo_gravidade (
+    id         INTEGER PRIMARY KEY,
+    nome       VARCHAR(50) NOT NULL UNIQUE,
+    isinactive BOOLEAN DEFAULT FALSE
+);
+
 CREATE TABLE tb_tipo_infracao (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
@@ -50,12 +58,6 @@ CREATE TABLE tb_tipo_risco (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
     descricao  TEXT,
-    isinactive BOOLEAN DEFAULT FALSE
-);
-
-CREATE TABLE tb_tipo_gravidade (
-    id         INTEGER PRIMARY KEY,
-    nome       VARCHAR(50) NOT NULL UNIQUE,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -330,17 +332,17 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, 1, false);
 
 -- 12) VIAGEM
-INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, id_decisao, tratativa, isinactive) VALUES
-(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 1, 'Registro sem ação.', false),
-(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00', 2, 'Motorista advertido verbalmente.', false),
-(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00', 3, 'Encaminhar para treinamento.', false),
-(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00', 4, 'Suspensão de 3 dias.', false),
-(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00', 5, 'Multa de R$ 500,00 aplicada.', false),
-(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00', 6, 'Enviar veículo para revisão.', false),
-(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00', 7, 'Seguro acionado.', false),
-(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00', 8, 'Ocorrência encerrada.', false),
-(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00', 9, 'Encaminhado à polícia.', false),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00', 10, 'Rota alterada conforme recomendação.', false);
+INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, isinactive) VALUES
+(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 'Registro sem ação.', false),
+(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00',  'Motorista advertido verbalmente.', false),
+(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00',  'Encaminhar para treinamento.', false),
+(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00',  'Suspensão de 3 dias.', false),
+(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00',  'Multa de R$ 500,00 aplicada.', false),
+(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00',  'Enviar veículo para revisão.', false),
+(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00',  'Seguro acionado.', false),
+(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00',  'Ocorrência encerrada.', false),
+(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00',  'Encaminhado à polícia.', false),
+(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00',  'Rota alterada conforme recomendação.', false);
 
 -- 13) OCORRENCIA
 INSERT INTO tb_infracao (id, id_viagem, id_caminhao, id_motorista, id_usuario, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, isinactive) VALUES
