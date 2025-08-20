@@ -147,7 +147,7 @@ CREATE TABLE tb_viagem (
     dt_hr_inicio TIMESTAMP,
     dt_hr_fim    TIMESTAMP,
     tratativa    TEXT,
-    km_viagem    VARCHAR DEFAULT 'Não informado'
+    km_viagem    VARCHAR DEFAULT 'Não informado',
     isinactive   BOOLEAN DEFAULT FALSE
 );
 
