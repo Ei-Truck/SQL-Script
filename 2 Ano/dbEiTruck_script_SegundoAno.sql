@@ -209,7 +209,7 @@ INSERT INTO tb_status (id, nome, isinactive) VALUES
 (10, 'Suspenso', true);
 
 INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
-(1,'Não informado',false)
+(1,'Não informado',false);
 
 -- 2) TIPO_OCORRENCIA
 INSERT INTO tb_tipo_infracao (id, nome, pontuacao,id_tipo_gravidade, isinactive) VALUES
