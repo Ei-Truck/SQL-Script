@@ -20,7 +20,7 @@ drop table if exists tb_tipo_risco cascade;
 drop table if exists tb_unidade cascade;
 drop table if exists tb_segmento cascade;
 drop table if exists tb_status cascade;
-drop table if exists lg_login_usuario cascade;
+drop table if exists tb_tipo_gravidade cascade;
 drop view if exists vw_relatorio_simples_viagem;
 drop view if exists vw_visao_basica_viagem;
 drop view if exists vw_ocorrencia_por_viagem;
@@ -180,16 +180,6 @@ CREATE TABLE tb_midia_infracao (
     duracao_clipe  NUMERIC(6, 2),
     dt_hr_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive     BOOLEAN DEFAULT FALSE
-);
-
--- =============================
--- LOGS
--- =============================
-CREATE TABLE lg_login_usuario (
-    id SERIAL PRIMARY KEY,
-    dt_hr_login TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    id_usuario INTEGER NOT NULL,
-    FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id) ON DELETE CASCADE
 );
 
 
