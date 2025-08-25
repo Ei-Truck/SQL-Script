@@ -192,6 +192,14 @@ CREATE TABLE lg_login_usuario (
 );
 
 -- =============================
+-- DAU
+-- =============================
+CREATE TABLE tb_daily_active_users (
+    data DATE PRIMARY KEY,
+    qtd_usuarios INT DEFAULT 0
+);
+
+-- =============================
 -- LOAD
 -- =============================
 
