@@ -449,4 +449,24 @@ GROUP BY v.id, t.nome;
 -- PROCS
 -- =============================
 
+-- =============================
+-- FUNCS
+-- =============================
+CREATE OR REPLACE FUNCTION fn_atualizar_dau()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO tb_dau (data, qtd_usuarios)
+    VALUES (
+        CURRENT_DATE,
+        (SELECT COUNT(DISTINCT id_usuario)
+         FROM lg_login_usuario
+         WHERE DATE(dt_hr_login) = CURRENT_DATE)
+    )
+    ON CONFLICT (data)
+    DO UPDATE SET qtd_usuarios = EXCLUDED.qtd_usuarios;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 COMMIT;
