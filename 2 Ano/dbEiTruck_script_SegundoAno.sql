@@ -469,4 +469,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- =============================
+-- TRIGGERS
+-- =============================
+
+CREATE TRIGGER trg_atualizar_dau
+AFTER INSERT ON lg_login_usuario
+FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_dau();
+
 COMMIT;
