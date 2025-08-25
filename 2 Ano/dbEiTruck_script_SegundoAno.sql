@@ -182,6 +182,14 @@ CREATE TABLE tb_midia_infracao (
     isinactive     BOOLEAN DEFAULT FALSE
 );
 
+-- =============================
+-- ACESSOS
+-- =============================
+CREATE TABLE lg_login_usuario (
+    id         SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES tb_usuario,
+    dt_hr_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- =============================
 -- LOAD
@@ -432,14 +440,5 @@ GROUP BY v.id, t.nome;
 -- =============================
 -- PROCS
 -- =============================
-CREATE OR REPLACE PROCEDURE prc_registrar_login_usuario(p_id_usuario INTEGER)
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-    INSERT INTO lg_login_usuario (id_usuario)
-    VALUES (p_id_usuario);
-END;
-$$;
-
 
 COMMIT;
