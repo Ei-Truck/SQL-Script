@@ -448,6 +448,14 @@ GROUP BY v.id, t.nome;
 -- =============================
 -- PROCS
 -- =============================
+CREATE OR REPLACE PROCEDURE prc_registrar_login_usuario(p_id_usuario INTEGER)
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO lg_login_usuario (id_usuario)
+    VALUES (p_id_usuario);
+END;
+$$;
 
 -- =============================
 -- FUNCS
