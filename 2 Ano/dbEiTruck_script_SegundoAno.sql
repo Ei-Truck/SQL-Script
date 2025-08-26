@@ -21,6 +21,8 @@ drop table if exists tb_unidade cascade;
 drop table if exists tb_segmento cascade;
 drop table if exists tb_status cascade;
 drop table if exists tb_tipo_gravidade cascade;
+drop table if exists lg_login_usuario cascade;
+drop table if exists tb_daily_active_users cascade;
 drop view if exists vw_relatorio_simples_viagem;
 drop view if exists vw_visao_basica_viagem;
 drop view if exists vw_ocorrencia_por_viagem;
