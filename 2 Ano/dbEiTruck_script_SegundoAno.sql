@@ -239,17 +239,18 @@ INSERT INTO tb_tipo_infracao (id, nome, pontuacao,id_tipo_gravidade, isinactive)
 
 
 -- 3) LOCALIDADE
-INSERT INTO tb_localidade (id, nome, isinactive) VALUES
-(1, 'São Paulo - SP', false),
-(2, 'Campinas - SP', false),
-(3, 'Rio de Janeiro - RJ', false),
-(4, 'Curitiba - PR', false),
-(5, 'Belo Horizonte - MG', false),
-(6, 'Porto Alegre - RS', false),
-(7, 'Recife - PE', false),
-(8, 'Salvador - BA', false),
-(9, 'Goiânia - GO', false),
-(10, 'Fortaleza - CE', false);
+INSERT INTO tb_localidade (uf, cep, cidade, rua, isinactive) VALUES
+('SP', '01001000', 'São Paulo', 'Avenida Paulista', FALSE),
+('RJ', '20040002', 'Rio de Janeiro', 'Rua da Quitanda', FALSE),
+('MG', '30140071', 'Belo Horizonte', 'Rua da Bahia', FALSE),
+('RS', '90010000', 'Porto Alegre', 'Rua dos Andradas', FALSE),
+('BA', '40020000', 'Salvador', 'Avenida Sete de Setembro', FALSE),
+('PR', '80010010', 'Curitiba', 'Rua XV de Novembro', FALSE),
+('PE', '50010000', 'Recife', 'Avenida Conde da Boa Vista', TRUE),
+('CE', '60025000', 'Fortaleza', 'Rua Dragão do Mar', FALSE),
+('DF', '70040900', 'Brasília', 'Esplanada dos Ministérios', FALSE),
+('AM', '69005000', 'Manaus', 'Avenida Eduardo Ribeiro', TRUE);
+
 
 -- 4) SEGMENTO
 INSERT INTO tb_segmento (id, nome, id_status, isinactive) VALUES
