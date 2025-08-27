@@ -52,7 +52,10 @@ CREATE TABLE tb_tipo_infracao (
 
 CREATE TABLE tb_localidade (
     id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(80) NOT NULL UNIQUE,
+    uf         VARCHAR(2) NOT NULL,
+    cep        VARCHAR(8) NOT NULL,
+    cidade     VARCHAR(255) NOT NULL,
+    rua        VARCHAR(255) NOT NULL,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
