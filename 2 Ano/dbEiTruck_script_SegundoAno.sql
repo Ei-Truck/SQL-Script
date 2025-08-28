@@ -192,20 +192,24 @@ CREATE TABLE tb_daily_active_users (
 -- LOAD
 -- =============================
 INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
-(1,'Não informado',false);
+(1, 'Leve', false),
+(2, 'Média', false),
+(3, 'Grave', false),
+(4, 'Gravíssima', false),
+(5, 'Crítica', true);
 
 -- 2) TIPO_OCORRENCIA
-INSERT INTO tb_tipo_infracao (id, nome, pontuacao,id_tipo_gravidade, isinactive) VALUES
+INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade, isinactive) VALUES
 (1, 'Excesso de velocidade', 5,1, false),
-(2, 'Frenagem brusca', 3,1, false),
-(3, 'Aceleração brusca', 3,1, false),
-(4, 'Colisão', 10,1, false),
-(5, 'Pane mecânica', 6,1, false),
+(2, 'Frenagem brusca', 3,2, false),
+(3, 'Aceleração brusca', 3,3, false),
+(4, 'Colisão', 10,4, false),
+(5, 'Pane mecânica', 6,5, false),
 (6, 'Desvio de rota', 4,1, true),
-(7, 'Falha de comunicação', 2,1, false),
-(8, 'Carga violada', 8,1, false),
-(9, 'Parada não autorizada', 4,1, false),
-(10, 'Uso não autorizado', 7,1, true);
+(7, 'Falha de comunicação', 2,2, false),
+(8, 'Carga violada', 8,3, false),
+(9, 'Parada não autorizada', 4,4, false),
+(10, 'Uso não autorizado', 7,5, true);
 
 
 -- 3) LOCALIDADE
@@ -275,16 +279,11 @@ INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_com
 
 -- 8) TIPO_RISCO
 INSERT INTO tb_tipo_risco (id, nome, descricao, isinactive) VALUES
-(1, 'Baixo', 'Risco baixo de acidentes', false),
-(2, 'Médio', 'Risco moderado', false),
-(3, 'Alto', 'Risco elevado de acidentes', false),
-(4, 'Crítico', 'Risco muito alto', false),
-(5, 'Especial', 'Risco em cargas especiais', false),
-(6, 'Ambiental', 'Risco ambiental', false),
-(7, 'Químico', 'Risco relacionado a produtos químicos', false),
-(8, 'Inflamável', 'Risco de incêndio', false),
-(9, 'Explosivo', 'Risco de explosão', false),
-(10, 'Biológico', 'Risco de contaminação', false);
+(1, 'Baixo', 'Motoristas com baixo risco de infrações.', false),
+(2, 'Médio', 'Motoristas com risco moderado de infrações.', false),
+(3, 'Alto', 'Motoristas com alto risco de infrações.', false),
+(4, 'Crítico', 'Motoristas com risco crítico de infrações.', false),
+(5, 'Especial', 'Motoristas que requerem atenção especial.', false)
 
 -- 9) MOTORISTA
 INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco, isinactive) VALUES
@@ -293,11 +292,11 @@ INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, ema
 (3, '345.345.345-34', 3, 'RJ3456789', 'Marcelo Almeida', '(21)96666-3333', 'marcelo.almeida@empresa.com', 3, false),
 (4, '456.456.456-45', 4, 'PR4567890', 'Felipe Rocha', '(41)95555-4444', 'felipe.rocha@empresa.com', 4, false),
 (5, '567.567.567-56', 5, 'MG5678901', 'Renato Dias', '(31)94444-5555', 'renato.dias@empresa.com', 5, false),
-(6, '678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 6, false),
-(7, '789.789.789-78', 7, 'PE7890123', 'André Ferreira', '(81)92222-7777', 'andre.ferreira@empresa.com', 7, false),
-(8, '890.890.890-89', 8, 'BA8901234', 'Thiago Campos', '(71)91111-8888', 'thiago.campos@empresa.com', 8, false),
-(9, '901.901.901-90', 9, 'GO9012345', 'Diego Farias', '(62)90000-9999', 'diego.farias@empresa.com', 9, false),
-(10, '012.012.012-01', 10, 'CE0123456', 'Rafael Souza', '(85)98888-0000', 'rafael.souza@empresa.com', 10, false);
+(6, '678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 1, false),
+(7, '789.789.789-78', 7, 'PE7890123', 'André Ferreira', '(81)92222-7777', 'andre.ferreira@empresa.com', 2, false),
+(8, '890.890.890-89', 8, 'BA8901234', 'Thiago Campos', '(71)91111-8888', 'thiago.campos@empresa.com', 3, false),
+(9, '901.901.901-90', 9, 'GO9012345', 'Diego Farias', '(62)90000-9999', 'diego.farias@empresa.com', 4, false),
+(10, '012.012.012-01', 10, 'CE0123456', 'Rafael Souza', '(85)98888-0000', 'rafael.souza@empresa.com', 5, false);
 
 -- 10) CAMINHAO
 INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano_fabricacao, numero_frota, isinactive) VALUES
@@ -397,13 +396,15 @@ SELECT
     tr.nome         AS risco_motorista,
     v.id            AS id_viagem,
     m.id            AS id_motorista,
+    tg.id           AS id_tipo_gravidade,
     tr.id           AS id_tipo_risco,
     o.id            AS id_infracao,
     c.id            AS id_caminhao
 FROM tb_viagem v
 JOIN tb_motorista m ON m.id = v.id_motorista
-JOIN tb_tipo_risco tr ON tr.id = m.id_tipo_risco
+JOIN tb_tipo_risco tr ON m.id_tipo_risco = tr.id
 JOIN tb_infracao o ON o.id_viagem = v.id
+JOIN tb_tipo_gravidade tg ON tg.id = o.id_tipo_gravidade
 JOIN tb_caminhao c ON c.id = v.id_caminhao
 GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, v.id, m.id, tr.id, o.id, c.id, m.nome_completo;
 
