@@ -386,6 +386,7 @@ CREATE VIEW vw_visao_basica_viagem (
     risco_motorista,
     id_viagem,
     id_motorista,
+    id_tipo_gravidade,
     id_tipo_risco,
     id_infracao,
     id_caminhao
@@ -407,9 +408,10 @@ FROM tb_viagem v
 JOIN tb_motorista m ON m.id = v.id_motorista
 JOIN tb_tipo_risco tr ON m.id_tipo_risco = tr.id
 JOIN tb_infracao o ON o.id_viagem = v.id
-JOIN tb_tipo_gravidade tg ON tg.id = o.id_tipo_gravidade
+JOIN tb_tipo_infracao t ON t.id = o.id_tipo_infracao
+JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
 JOIN tb_caminhao c ON c.id = v.id_caminhao
-GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, v.id, m.id, tr.id, o.id, c.id, m.nome_completo;
+GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, v.id, m.id, tr.id, tg.id, o.id, c.id;
 
 CREATE VIEW vw_ocorrencia_por_viagem (
     total_ocorrencias,
