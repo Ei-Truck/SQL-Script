@@ -19,7 +19,6 @@ drop table if exists tb_motorista cascade;
 drop table if exists tb_tipo_risco cascade;
 drop table if exists tb_unidade cascade;
 drop table if exists tb_segmento cascade;
-drop table if exists tb_status cascade;
 drop table if exists tb_tipo_gravidade cascade;
 drop table if exists lg_login_usuario cascade;
 drop table if exists tb_daily_active_users cascade;
@@ -30,12 +29,6 @@ drop view if exists vw_ocorrencia_por_viagem;
 -- =============================
 -- STATUS E TABELAS DE APOIO
 -- =============================
-CREATE TABLE tb_status (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(20) NOT NULL UNIQUE,
-    isinactive BOOLEAN DEFAULT FALSE
-);
-
 CREATE TABLE tb_tipo_gravidade (
     id         INTEGER PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
@@ -52,10 +45,7 @@ CREATE TABLE tb_tipo_infracao (
 
 CREATE TABLE tb_localidade (
     id         SERIAL PRIMARY KEY,
-    uf         VARCHAR(2) NOT NULL,
-    cep        VARCHAR(8) NOT NULL,
-    cidade     VARCHAR(255) NOT NULL,
-    rua        VARCHAR(255) NOT NULL,
+    nome       VARCHAR(80) NOT NULL UNIQUE,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -72,7 +62,6 @@ CREATE TABLE tb_tipo_risco (
 CREATE TABLE tb_segmento (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(40) NOT NULL UNIQUE,
-    id_status  INTEGER REFERENCES tb_status,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -104,7 +93,6 @@ CREATE TABLE tb_usuario (
     email          VARCHAR(150) NOT NULL UNIQUE,
     hash_senha     VARCHAR(100) NOT NULL,
     url_foto       VARCHAR(255) DEFAULT 'Sem foto',
-    id_status      INTEGER REFERENCES tb_status,
     id_cargo       INTEGER NOT NULL REFERENCES tb_cargo,
     isinactive     BOOLEAN DEFAULT FALSE
 );
@@ -121,7 +109,6 @@ CREATE TABLE tb_caminhao (
     modelo         VARCHAR(80) DEFAULT 'Não informado',
     ano_fabricacao INTEGER,
     numero_frota   INTEGER NOT NULL,
-    id_status      INTEGER REFERENCES tb_status,
     isinactive     BOOLEAN DEFAULT FALSE
 );
 
@@ -136,9 +123,8 @@ CREATE TABLE tb_motorista (
     nome_completo VARCHAR(150) NOT NULL,
     telefone      VARCHAR(15) NOT NULL,
     email_empresa VARCHAR(150),
-    risco         INTEGER REFERENCES tb_tipo_risco,
+    id_tipo_risco INTEGER REFERENCES tb_tipo_risco,
     url_foto      VARCHAR(255) DEFAULT 'Sem foto',
-    id_status     INTEGER REFERENCES tb_status,
     isinactive    BOOLEAN DEFAULT FALSE
 );
 
@@ -207,20 +193,6 @@ CREATE TABLE tb_daily_active_users (
 -- =============================
 -- LOAD
 -- =============================
-
--- 1) STATUS
-INSERT INTO tb_status (id, nome, isinactive) VALUES
-(1, 'Ativo', false),
-(2, 'Inativo', true),
-(3, 'Em manutenção', false),
-(4, 'Em trânsito', false),
-(5, 'Bloqueado', true),
-(6, 'Disponível', false),
-(7, 'Em uso', false),
-(8, 'Desativado', true),
-(9, 'Pendente', false),
-(10, 'Suspenso', true);
-
 INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
 (1,'Não informado',false);
 
@@ -239,31 +211,30 @@ INSERT INTO tb_tipo_infracao (id, nome, pontuacao,id_tipo_gravidade, isinactive)
 
 
 -- 3) LOCALIDADE
-INSERT INTO tb_localidade (uf, cep, cidade, rua, isinactive) VALUES
-('SP', '01001000', 'São Paulo', 'Avenida Paulista', FALSE),
-('RJ', '20040002', 'Rio de Janeiro', 'Rua da Quitanda', FALSE),
-('MG', '30140071', 'Belo Horizonte', 'Rua da Bahia', FALSE),
-('RS', '90010000', 'Porto Alegre', 'Rua dos Andradas', FALSE),
-('BA', '40020000', 'Salvador', 'Avenida Sete de Setembro', FALSE),
-('PR', '80010010', 'Curitiba', 'Rua XV de Novembro', FALSE),
-('PE', '50010000', 'Recife', 'Avenida Conde da Boa Vista', TRUE),
-('CE', '60025000', 'Fortaleza', 'Rua Dragão do Mar', FALSE),
-('DF', '70040900', 'Brasília', 'Esplanada dos Ministérios', FALSE),
-('AM', '69005000', 'Manaus', 'Avenida Eduardo Ribeiro', TRUE);
-
+INSERT INTO tb_localidade (id, nome, isinactive) VALUES
+(1, 'São Paulo - SP', false),
+(2, 'Campinas - SP', false),
+(3, 'Rio de Janeiro - RJ', false),
+(4, 'Curitiba - PR', false),
+(5, 'Belo Horizonte - MG', false),
+(6, 'Porto Alegre - RS', false),
+(7, 'Recife - PE', false),
+(8, 'Salvador - BA', false),
+(9, 'Goiânia - GO', false),
+(10, 'Fortaleza - CE', false);
 
 -- 4) SEGMENTO
-INSERT INTO tb_segmento (id, nome, id_status, isinactive) VALUES
-(1, 'Transporte de Carga Seca', 1, false),
-(2, 'Transporte Refrigerado', 6, false),
-(3, 'Transporte de Combustível', 3, false),
-(4, 'Transporte de Produtos Químicos', 1, false),
-(5, 'Transporte de Gases', 1, false),
-(6, 'Transporte Fracionado', 6, false),
-(7, 'Transporte de Veículos', 7, false),
-(8, 'Transporte de Encomendas', 1, false),
-(9, 'Transporte de Animais', 9, false),
-(10, 'Transporte Especial', 1, true);
+INSERT INTO tb_segmento (id, nome, isinactive) VALUES
+(1, 'Transporte de Carga Seca', false),
+(2, 'Transporte Refrigerado', false),
+(3, 'Transporte de Combustível', false),
+(4, 'Transporte de Produtos Químicos', false),
+(5, 'Transporte de Gases', false),
+(6, 'Transporte Fracionado', false),
+(7, 'Transporte de Veículos', false),
+(8, 'Transporte de Encomendas', false),
+(9, 'Transporte de Animais', false),
+(10, 'Transporte Especial', true);
 
 -- 5) UNIDADE
 INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado, isinactive) VALUES
@@ -292,17 +263,17 @@ INSERT INTO tb_cargo (id, nome, isinactive) VALUES
 (10, 'Diretor de Operações', false);
 
 -- 7) USUARIO
-INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_status, id_cargo, isinactive) VALUES
-(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', 'joao.silva@empresa.com', 'hash1', 1, 2, false),
-(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', 'maria.oliveira@empresa.com', 'hash2', 1, 4, false),
-(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', 'carlos.souza@empresa.com', 'hash3', 1, 6, false),
-(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', 'fernanda.lima@empresa.com', 'hash4', 1, 5, false),
-(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', 'ricardo.alves@empresa.com', 'hash5', 1, 7, false),
-(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', 'paula.mendes@empresa.com', 'hash6', 2, 8, false),
-(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', 'bruno.ferreira@empresa.com', 'hash7', 1, 9, false),
-(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', 'aline.costa@empresa.com', 'hash8', 1, 3, false),
-(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', 'gustavo.pereira@empresa.com', 'hash9', 1, 10, false),
-(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', 'larissa.martins@empresa.com', 'hash10', 1, 1, false);
+INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_cargo, isinactive) VALUES
+(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', 'joao.silva@empresa.com', 'hash1', 2, false),
+(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', 'maria.oliveira@empresa.com', 'hash2', 4, false),
+(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', 'carlos.souza@empresa.com', 'hash3', 6, false),
+(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', 'fernanda.lima@empresa.com', 'hash4', 5, false),
+(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', 'ricardo.alves@empresa.com', 'hash5', 7, false),
+(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', 'paula.mendes@empresa.com', 'hash6', 8, false),
+(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', 'bruno.ferreira@empresa.com', 'hash7', 9, false),
+(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', 'aline.costa@empresa.com', 'hash8', 3, false),
+(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', 'gustavo.pereira@empresa.com', 'hash9', 10, false),
+(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', 'larissa.martins@empresa.com', 'hash10', 1, false);
 
 -- 8) TIPO_RISCO
 INSERT INTO tb_tipo_risco (id, nome, descricao, isinactive) VALUES
@@ -318,30 +289,30 @@ INSERT INTO tb_tipo_risco (id, nome, descricao, isinactive) VALUES
 (10, 'Biológico', 'Risco de contaminação', false);
 
 -- 9) MOTORISTA
-INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, risco, id_status, isinactive) VALUES
-(1, '123.123.123-12', 1, 'MG1234567', 'Paulo Gomes', '(11)98888-1111', 'paulo.gomes@empresa.com', 1, 1, false),
-(2, '234.234.234-23', 2, 'SP2345678', 'Rodrigo Santos', '(19)97777-2222', 'rodrigo.santos@empresa.com', 2, 1, false),
-(3, '345.345.345-34', 3, 'RJ3456789', 'Marcelo Almeida', '(21)96666-3333', 'marcelo.almeida@empresa.com', 3, 1, false),
-(4, '456.456.456-45', 4, 'PR4567890', 'Felipe Rocha', '(41)95555-4444', 'felipe.rocha@empresa.com', 4, 1, false),
-(5, '567.567.567-56', 5, 'MG5678901', 'Renato Dias', '(31)94444-5555', 'renato.dias@empresa.com', 5, 1, false),
-(6, '678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 6, 1, false),
-(7, '789.789.789-78', 7, 'PE7890123', 'André Ferreira', '(81)92222-7777', 'andre.ferreira@empresa.com', 7, 1, false),
-(8, '890.890.890-89', 8, 'BA8901234', 'Thiago Campos', '(71)91111-8888', 'thiago.campos@empresa.com', 8, 1, false),
-(9, '901.901.901-90', 9, 'GO9012345', 'Diego Farias', '(62)90000-9999', 'diego.farias@empresa.com', 9, 1, false),
-(10, '012.012.012-01', 10, 'CE0123456', 'Rafael Souza', '(85)98888-0000', 'rafael.souza@empresa.com', 10, 1, false);
+INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco, isinactive) VALUES
+(1, '123.123.123-12', 1, 'MG1234567', 'Paulo Gomes', '(11)98888-1111', 'paulo.gomes@empresa.com', 1, false),
+(2, '234.234.234-23', 2, 'SP2345678', 'Rodrigo Santos', '(19)97777-2222', 'rodrigo.santos@empresa.com', 2, false),
+(3, '345.345.345-34', 3, 'RJ3456789', 'Marcelo Almeida', '(21)96666-3333', 'marcelo.almeida@empresa.com', 3, false),
+(4, '456.456.456-45', 4, 'PR4567890', 'Felipe Rocha', '(41)95555-4444', 'felipe.rocha@empresa.com', 4, false),
+(5, '567.567.567-56', 5, 'MG5678901', 'Renato Dias', '(31)94444-5555', 'renato.dias@empresa.com', 5, false),
+(6, '678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 6, false),
+(7, '789.789.789-78', 7, 'PE7890123', 'André Ferreira', '(81)92222-7777', 'andre.ferreira@empresa.com', 7, false),
+(8, '890.890.890-89', 8, 'BA8901234', 'Thiago Campos', '(71)91111-8888', 'thiago.campos@empresa.com', 8, false),
+(9, '901.901.901-90', 9, 'GO9012345', 'Diego Farias', '(62)90000-9999', 'diego.farias@empresa.com', 9, false),
+(10, '012.012.012-01', 10, 'CE0123456', 'Rafael Souza', '(85)98888-0000', 'rafael.souza@empresa.com', 10, false);
 
 -- 10) CAMINHAO
-INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano_fabricacao, numero_frota, id_status, isinactive) VALUES
-(1, '9BWZZZ377VT004251', 1, 1, 'BRA1A23', 'Volvo FH 540', 2019, 101, 1, false),
-(2, '8AWZZZ377VT004252', 2, 2, 'BRA2B34', 'Scania R450', 2020, 102, 1, false),
-(3, '7CWZZZ377VT004253', 3, 3, 'BRA3C45', 'Mercedes Actros', 2018, 103, 1, false),
-(4, '6DWZZZ377VT004254', 4, 4, 'BRA4D56', 'Volvo VM 270', 2021, 104, 1, false),
-(5, '5EWZZZ377VT004255', 5, 5, 'BRA4D51','Iveco Hi-Way', 2017, 105, 1, false),
-(6, '4FWZZZ377VT004256', 6, 6, 'BRA4D52','MAN TGX', 2022, 106, 1, false),
-(7, '3GWZZZ377VT004257', 7, 7, 'BRA4D53','Scania S500', 2019, 107, 1, false),
-(8, '2HWZZZ377VT004258', 8, 8,'BRA4D54', 'Volvo FH 460', 2023, 108, 1, false),
-(9, '1IWZZZ377VT004259', 9, 9, 'BRA4D55','Mercedes Axor', 2016, 109, 1, false),
-(10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, 1, false);
+INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano_fabricacao, numero_frota, isinactive) VALUES
+(1, '9BWZZZ377VT004251', 1, 1, 'BRA1A23', 'Volvo FH 540', 2019, 101, false),
+(2, '8AWZZZ377VT004252', 2, 2, 'BRA2B34', 'Scania R450', 2020, 102, false),
+(3, '7CWZZZ377VT004253', 3, 3, 'BRA3C45', 'Mercedes Actros', 2018, 103, false),
+(4, '6DWZZZ377VT004254', 4, 4, 'BRA4D56', 'Volvo VM 270', 2021, 104, false),
+(5, '5EWZZZ377VT004255', 5, 5, 'BRA4D51','Iveco Hi-Way', 2017, 105, false),
+(6, '4FWZZZ377VT004256', 6, 6, 'BRA4D52','MAN TGX', 2022, 106, false),
+(7, '3GWZZZ377VT004257', 7, 7, 'BRA4D53','Scania S500', 2019, 107, false),
+(8, '2HWZZZ377VT004258', 8, 8,'BRA4D54', 'Volvo FH 460', 2023, 108, false),
+(9, '1IWZZZ377VT004259', 9, 9, 'BRA4D55','Mercedes Axor', 2016, 109, false),
+(10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, false);
 
 -- 12) VIAGEM
 INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, isinactive) VALUES
@@ -432,7 +403,7 @@ SELECT
     c.id            AS id_caminhao
 FROM tb_viagem v
 JOIN tb_motorista m ON m.id = v.id_motorista
-JOIN tb_tipo_risco tr ON tr.id = m.risco
+JOIN tb_tipo_risco tr ON tr.id = m.id_tipo_risco
 JOIN tb_infracao o ON o.id_viagem = v.id
 JOIN tb_caminhao c ON c.id = v.id_caminhao
 GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, v.id, m.id, tr.id, o.id, c.id, m.nome_completo;
