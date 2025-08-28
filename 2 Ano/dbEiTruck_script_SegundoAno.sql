@@ -45,6 +45,8 @@ CREATE TABLE tb_tipo_infracao (
 
 CREATE TABLE tb_localidade (
     id         SERIAL PRIMARY KEY,
+    cep        VARCHAR(10),
+    uf_estado  VARCHAR(2),
     nome       VARCHAR(80) NOT NULL UNIQUE,
     isinactive BOOLEAN DEFAULT FALSE
 );
@@ -213,17 +215,17 @@ INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade, isinactive
 
 
 -- 3) LOCALIDADE
-INSERT INTO tb_localidade (id, nome, isinactive) VALUES
-(1, 'São Paulo - SP', false),
-(2, 'Campinas - SP', false),
-(3, 'Rio de Janeiro - RJ', false),
-(4, 'Curitiba - PR', false),
-(5, 'Belo Horizonte - MG', false),
-(6, 'Porto Alegre - RS', false),
-(7, 'Recife - PE', false),
-(8, 'Salvador - BA', false),
-(9, 'Goiânia - GO', false),
-(10, 'Fortaleza - CE', false);
+INSERT INTO tb_localidade (id, cep, uf_estado, nome, isinactive) VALUES
+(1, '00000-000', 'SP', 'São Paulo', false),
+(2, '11111-111', 'SP', 'Campinas', false),
+(3, '22222-222', 'RJ', 'Rio de Janeiro', false),
+(4, '33333-333', 'PR', 'Curitiba', false),
+(5, '44444-444', 'MG', 'Belo Horizonte', false),
+(6, '55555-555', 'RS', 'Porto Alegre', false),
+(7, '66666-666', 'PE', 'Recife', false),
+(8, '77777-777', 'BA', 'Salvador', false),
+(9, '88888-888', 'GO', 'Goiânia', false),
+(10, '99999-999', 'CE', 'Fortaleza', false);
 
 -- 4) SEGMENTO
 INSERT INTO tb_segmento (id, nome, isinactive) VALUES
