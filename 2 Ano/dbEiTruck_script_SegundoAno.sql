@@ -135,6 +135,7 @@ CREATE TABLE tb_viagem (
     id           SERIAL PRIMARY KEY,
     id_caminhao  INTEGER NOT NULL REFERENCES tb_caminhao,
     id_motorista INTEGER NOT NULL REFERENCES tb_motorista,
+    id_usuario   INTEGER REFERENCES tb_usuario,
     id_origem    INTEGER REFERENCES tb_localidade,
     id_destino   INTEGER REFERENCES tb_localidade,
     dt_hr_inicio TIMESTAMP,
@@ -150,9 +151,6 @@ CREATE TABLE tb_viagem (
 CREATE TABLE tb_infracao (
     id                 SERIAL PRIMARY KEY,
     id_viagem          INTEGER REFERENCES tb_viagem,
-    id_caminhao        INTEGER NOT NULL REFERENCES tb_caminhao,
-    id_motorista       INTEGER NOT NULL REFERENCES tb_motorista,
-    id_usuario         INTEGER REFERENCES tb_usuario,
     dt_hr_evento       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_tipo_infracao   INTEGER REFERENCES tb_tipo_infracao,
     latitude           NUMERIC(9, 7),
@@ -166,7 +164,7 @@ CREATE TABLE tb_infracao (
 -- =============================
 CREATE TABLE tb_midia_infracao (
     id             SERIAL PRIMARY KEY,
-    id_infracao  INTEGER NOT NULL REFERENCES tb_infracao,
+    id_infracao    INTEGER NOT NULL REFERENCES tb_infracao,
     arquivo        VARCHAR(250) NOT NULL,
     duracao_clipe  NUMERIC(6, 2),
     dt_hr_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -315,30 +313,30 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, false);
 
 -- 12) VIAGEM
-INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, isinactive) VALUES
-(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 'Registro sem ação.', false),
-(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00',  'Motorista advertido verbalmente.', false),
-(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00',  'Encaminhar para treinamento.', false),
-(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00',  'Suspensão de 3 dias.', false),
-(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00',  'Multa de R$ 500,00 aplicada.', false),
-(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00',  'Enviar veículo para revisão.', false),
-(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00',  'Seguro acionado.', false),
-(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00',  'Ocorrência encerrada.', false),
-(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00',  'Encaminhado à polícia.', false),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00',  'Rota alterada conforme recomendação.', false);
+INSERT INTO tb_viagem (id, id_caminhao, id_motorista, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, isinactive) VALUES
+(1, 1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 'Registro sem ação.', false),
+(2, 2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00',  'Motorista advertido verbalmente.', false),
+(3, 3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00',  'Encaminhar para treinamento.', false),
+(4, 4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00',  'Suspensão de 3 dias.', false),
+(5, 5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00',  'Multa de R$ 500,00 aplicada.', false),
+(6, 6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00',  'Enviar veículo para revisão.', false),
+(7, 7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00',  'Seguro acionado.', false),
+(8, 8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00',  'Ocorrência encerrada.', false),
+(9, 9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00',  'Encaminhado à polícia.', false),
+(10, 10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00',  'Rota alterada conforme recomendação.', false);
 
 -- 13) OCORRENCIA
-INSERT INTO tb_infracao (id, id_viagem, id_caminhao, id_motorista, id_usuario, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, isinactive) VALUES
-(1, 1, 1, 1, 1, '2023-01-10 10:15:00', 1, -23.550520, -46.633308, 95.5, false),
-(2, 2, 2, 2, 2, '2023-02-15 11:30:00', 2, -22.909938, -47.062633, 80.0, false),
-(3, 3, 3, 3, 3, '2023-03-05 13:10:00', 4, -22.906847, -43.172896, 60.0, false),
-(4, 4, 4, 4, 4, '2023-04-12 09:20:00', 5, -25.428356, -49.273251, 50.0, false),
-(5, 5, 5, 5, 5, '2023-05-20 12:45:00', 6, -19.916681, -43.934493, 70.0, false),
-(6, 6, 6, 6, 6, '2023-06-18 14:30:00', 7, -30.034647, -51.217658, 65.0, false),
-(7, 7, 7, 7, 7, '2023-07-01 11:00:00', 8, -8.047562, -34.877000, 40.0, false),
-(8, 8, 8, 8, 8, '2023-08-08 08:30:00', 9, -12.977749, -38.501630, 55.0, false),
-(9, 9, 9, 9, 9, '2023-09-22 10:20:00', 10, -16.686882, -49.264788, 50.0, false),
-(10, 10, 10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0, false);
+INSERT INTO tb_infracao (id, id_viagem, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, isinactive) VALUES
+(1, 1, '2023-01-10 10:15:00', 1, -23.550520, -46.633308, 95.5, false),
+(2, 2, '2023-02-15 11:30:00', 2, -22.909938, -47.062633, 80.0, false),
+(3, 3, '2023-03-05 13:10:00', 4, -22.906847, -43.172896, 60.0, false),
+(4, 4, '2023-04-12 09:20:00', 5, -25.428356, -49.273251, 50.0, false),
+(5, 5, '2023-05-20 12:45:00', 6, -19.916681, -43.934493, 70.0, false),
+(6, 6, '2023-06-18 14:30:00', 7, -30.034647, -51.217658, 65.0, false),
+(7, 7, '2023-07-01 11:00:00', 8, -8.047562, -34.877000, 40.0, false),
+(8, 8, '2023-08-08 08:30:00', 9, -12.977749, -38.501630, 55.0, false),
+(9, 9, '2023-09-22 10:20:00', 10, -16.686882, -49.264788, 50.0, false),
+(10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0, false);
 
 -- 14) MÍDIA DA OCORRÊNCIA
 INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro, isinactive) VALUES
@@ -374,6 +372,7 @@ SELECT
 FROM tb_infracao o
 JOIN tb_viagem v   ON o.id_viagem = v.id
 JOIN tb_caminhao c ON v.id_caminhao = c.id
+JOIN tb_motorista m ON m.id = v.id_motorista
 GROUP BY c.placa, v.dt_hr_inicio, o.id, v.id, c.id;
 
 CREATE VIEW vw_visao_basica_viagem (
