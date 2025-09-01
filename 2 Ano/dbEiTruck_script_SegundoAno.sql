@@ -34,7 +34,7 @@ CREATE TABLE tb_tipo_gravidade (
     nome       VARCHAR(50) NOT NULL UNIQUE,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_tipo_infracao (
@@ -44,7 +44,7 @@ CREATE TABLE tb_tipo_infracao (
     id_tipo_gravidade INTEGER REFERENCES tb_tipo_gravidade,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_localidade (
@@ -55,7 +55,7 @@ CREATE TABLE tb_localidade (
     nome       VARCHAR(80) NOT NULL UNIQUE,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_tipo_risco (
@@ -64,7 +64,7 @@ CREATE TABLE tb_tipo_risco (
     descricao  TEXT,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -75,7 +75,7 @@ CREATE TABLE tb_segmento (
     nome       VARCHAR(40) NOT NULL UNIQUE,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_unidade (
@@ -86,7 +86,7 @@ CREATE TABLE tb_unidade (
     uf_estado   VARCHAR(2),
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive  BOOLEAN DEFAULT FALSE
+    is_inactive  BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -97,7 +97,7 @@ CREATE TABLE tb_cargo (
     nome       VARCHAR(255) NOT NULL UNIQUE,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive BOOLEAN DEFAULT FALSE
+    is_inactive BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_usuario (
@@ -113,7 +113,7 @@ CREATE TABLE tb_usuario (
     id_cargo       INTEGER NOT NULL REFERENCES tb_cargo,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive     BOOLEAN DEFAULT FALSE
+    is_inactive     BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -130,7 +130,7 @@ CREATE TABLE tb_caminhao (
     numero_frota     INTEGER NOT NULL,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive       BOOLEAN DEFAULT FALSE
+    is_inactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -148,7 +148,7 @@ CREATE TABLE tb_motorista (
     url_foto         VARCHAR(255) DEFAULT 'Sem foto',
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive       BOOLEAN DEFAULT FALSE
+    is_inactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -166,7 +166,7 @@ CREATE TABLE tb_viagem (
     km_viagem        VARCHAR DEFAULT 'Não informado',
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive       BOOLEAN DEFAULT FALSE
+    is_inactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -183,7 +183,7 @@ CREATE TABLE tb_infracao (
     velocidade_kmh     NUMERIC(5, 2),
     transaction_made   VARCHAR(20),
     updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive         BOOLEAN DEFAULT FALSE
+    is_inactive         BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -197,7 +197,7 @@ CREATE TABLE tb_midia_infracao (
     dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive       BOOLEAN DEFAULT FALSE
+    is_inactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -220,7 +220,7 @@ CREATE TABLE tb_daily_active_users (
 -- =============================
 -- LOAD
 -- =============================
-INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
+INSERT INTO tb_tipo_gravidade(id, nome, is_inactive) VALUES
 (1, 'Leve', false),
 (2, 'Média', false),
 (3, 'Grave', false),
@@ -228,7 +228,7 @@ INSERT INTO tb_tipo_gravidade(id, nome, isinactive) VALUES
 (5, 'Crítica', true);
 
 -- 2) TIPO_OCORRENCIA
-INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade, isinactive) VALUES
+INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade, is_inactive) VALUES
 (1, 'Excesso de velocidade', 5,1, false),
 (2, 'Frenagem brusca', 3,2, false),
 (3, 'Aceleração brusca', 3,3, false),
@@ -242,7 +242,7 @@ INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade, isinactive
 
 
 -- 3) LOCALIDADE
-INSERT INTO tb_localidade (id, cep, numero_rua, uf_estado, nome, isinactive) VALUES
+INSERT INTO tb_localidade (id, cep, numero_rua, uf_estado, nome, is_inactive) VALUES
 (1, '00000-000', 0, 'SP', 'São Paulo', false),
 (2, '11111-111', 1, 'SP', 'Campinas', false),
 (3, '22222-222', 2, 'RJ', 'Rio de Janeiro', false),
@@ -255,7 +255,7 @@ INSERT INTO tb_localidade (id, cep, numero_rua, uf_estado, nome, isinactive) VAL
 (10, '99999-999', 9, 'CE', 'Fortaleza', false);
 
 -- 4) SEGMENTO
-INSERT INTO tb_segmento (id, nome, isinactive) VALUES
+INSERT INTO tb_segmento (id, nome, is_inactive) VALUES
 (1, 'Transporte de Carga Seca', false),
 (2, 'Transporte Refrigerado', false),
 (3, 'Transporte de Combustível', false),
@@ -268,7 +268,7 @@ INSERT INTO tb_segmento (id, nome, isinactive) VALUES
 (10, 'Transporte Especial', true);
 
 -- 5) UNIDADE
-INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado, isinactive) VALUES
+INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado, is_inactive) VALUES
 (1, 1, 'Unidade São Paulo', 'São Paulo', 'SP', false),
 (2, 2, 'Unidade Campinas', 'Campinas', 'SP', false),
 (3, 3, 'Unidade Rio', 'Rio de Janeiro', 'RJ', false),
@@ -281,7 +281,7 @@ INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado, isinactive) VA
 (10, 10, 'Unidade Fortaleza', 'Fortaleza', 'CE', false);
 
 -- 6) CARGO
-INSERT INTO tb_cargo (id, nome, isinactive) VALUES
+INSERT INTO tb_cargo (id, nome, is_inactive) VALUES
 (1, 'Motorista', false),
 (2, 'Supervisor de Frota', false),
 (3, 'Mecânico', false),
@@ -294,7 +294,7 @@ INSERT INTO tb_cargo (id, nome, isinactive) VALUES
 (10, 'Diretor de Operações', false);
 
 -- 7) USUARIO
-INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_cargo, isinactive) VALUES
+INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_cargo, is_inactive) VALUES
 (1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', 'joao.silva@empresa.com', 'hash1', 2, false),
 (2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', 'maria.oliveira@empresa.com', 'hash2', 4, false),
 (3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', 'carlos.souza@empresa.com', 'hash3', 6, false),
@@ -307,7 +307,7 @@ INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_com
 (10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', 'larissa.martins@empresa.com', 'hash10', 1, false);
 
 -- 8) TIPO_RISCO
-INSERT INTO tb_tipo_risco (id, nome, descricao, isinactive) VALUES
+INSERT INTO tb_tipo_risco (id, nome, descricao, is_inactive) VALUES
 (1, 'Baixo', 'Motoristas com baixo risco de infrações.', false),
 (2, 'Médio', 'Motoristas com risco moderado de infrações.', false),
 (3, 'Alto', 'Motoristas com alto risco de infrações.', false),
@@ -315,7 +315,7 @@ INSERT INTO tb_tipo_risco (id, nome, descricao, isinactive) VALUES
 (5, 'Especial', 'Motoristas que requerem atenção especial.', false)
 
 -- 9) MOTORISTA
-INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco, isinactive) VALUES
+INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco, is_inactive) VALUES
 (1, '123.123.123-12', 1, 'MG1234567', 'Paulo Gomes', '(11)98888-1111', 'paulo.gomes@empresa.com', 1, false),
 (2, '234.234.234-23', 2, 'SP2345678', 'Rodrigo Santos', '(19)97777-2222', 'rodrigo.santos@empresa.com', 2, false),
 (3, '345.345.345-34', 3, 'RJ3456789', 'Marcelo Almeida', '(21)96666-3333', 'marcelo.almeida@empresa.com', 3, false),
@@ -328,7 +328,7 @@ INSERT INTO tb_motorista (id, cpf, id_unidade, cnh, nome_completo, telefone, ema
 (10, '012.012.012-01', 10, 'CE0123456', 'Rafael Souza', '(85)98888-0000', 'rafael.souza@empresa.com', 5, false);
 
 -- 10) CAMINHAO
-INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano_fabricacao, numero_frota, isinactive) VALUES
+INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano_fabricacao, numero_frota, is_inactive) VALUES
 (1, '9BWZZZ377VT004251', 1, 1, 'BRA1A23', 'Volvo FH 540', 2019, 101, false),
 (2, '8AWZZZ377VT004252', 2, 2, 'BRA2B34', 'Scania R450', 2020, 102, false),
 (3, '7CWZZZ377VT004253', 3, 3, 'BRA3C45', 'Mercedes Actros', 2018, 103, false),
@@ -341,7 +341,7 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, false);
 
 -- 12) VIAGEM
-INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, isinactive) VALUES
+INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, is_inactive) VALUES
 (1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 'Registro sem ação.', false),
 (2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00',  'Motorista advertido verbalmente.', false),
 (3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00',  'Encaminhar para treinamento.', false),
@@ -354,7 +354,7 @@ INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr
 (10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00',  'Rota alterada conforme recomendação.', false);
 
 -- 13) OCORRENCIA
-INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, isinactive) VALUES
+INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, is_inactive) VALUES
 (1, 1, 1, '2023-01-10 10:15:00', 1, -23.550520, -46.633308, 95.5, false),
 (2, 2, 2, '2023-02-15 11:30:00', 2, -22.909938, -47.062633, 80.0, false),
 (3, 3, 3, '2023-03-05 13:10:00', 4, -22.906847, -43.172896, 60.0, false),
@@ -367,7 +367,7 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0, false);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro, isinactive) VALUES
+INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro, is_inactive) VALUES
 (1, 1,  'ocorrencia1.mp4', 15.20, '2023-01-10 10:20:00', false),
 (2, 2,  'ocorrencia2.mp4', 10.00, '2023-02-15 11:40:00', false),
 (3, 3,  'ocorrencia3.mp4', 20.50, '2023-03-05 13:15:00', false),
