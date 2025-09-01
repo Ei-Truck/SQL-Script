@@ -120,53 +120,53 @@ CREATE TABLE tb_usuario (
 -- CAMINHÃO
 -- =============================
 CREATE TABLE tb_caminhao (
-    id             SERIAL PRIMARY KEY,
-    chassi         VARCHAR(20) NOT NULL UNIQUE,
-    id_segmento    INTEGER REFERENCES tb_segmento,
-    id_unidade     INTEGER REFERENCES tb_unidade,
-    placa          VARCHAR(10) NOT NULL UNIQUE,
-    modelo         VARCHAR(80) DEFAULT 'Não informado',
-    ano_fabricacao INTEGER,
-    numero_frota   INTEGER NOT NULL,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive     BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    chassi           VARCHAR(20) NOT NULL UNIQUE,
+    id_segmento      INTEGER REFERENCES tb_segmento,
+    id_unidade       INTEGER REFERENCES tb_unidade,
+    placa            VARCHAR(10) NOT NULL UNIQUE,
+    modelo           VARCHAR(80) DEFAULT 'Não informado',
+    ano_fabricacao   INTEGER,
+    numero_frota     INTEGER NOT NULL,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isinactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
 -- MOTORISTA
 -- =============================
 CREATE TABLE tb_motorista (
-    id            SERIAL PRIMARY KEY,
-    cpf           VARCHAR(15) NOT NULL UNIQUE,
-    id_unidade    INTEGER REFERENCES tb_unidade,
-    cnh           VARCHAR(15) NOT NULL UNIQUE,
-    nome_completo VARCHAR(150) NOT NULL,
-    telefone      VARCHAR(15) NOT NULL,
-    email_empresa VARCHAR(150),
-    id_tipo_risco INTEGER REFERENCES tb_tipo_risco,
-    url_foto      VARCHAR(255) DEFAULT 'Sem foto',
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive    BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    cpf              VARCHAR(15) NOT NULL UNIQUE,
+    id_unidade       INTEGER REFERENCES tb_unidade,
+    cnh              VARCHAR(15) NOT NULL UNIQUE,
+    nome_completo    VARCHAR(150) NOT NULL,
+    telefone         VARCHAR(15) NOT NULL,
+    email_empresa    VARCHAR(150),
+    id_tipo_risco    INTEGER REFERENCES tb_tipo_risco,
+    url_foto         VARCHAR(255) DEFAULT 'Sem foto',
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isinactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
 -- VIAGEM
 -- =============================
 CREATE TABLE tb_viagem (
-    id           SERIAL PRIMARY KEY,
-    id_caminhao  INTEGER NOT NULL REFERENCES tb_caminhao,
-    id_usuario   INTEGER REFERENCES tb_usuario,
-    id_origem    INTEGER REFERENCES tb_localidade,
-    id_destino   INTEGER REFERENCES tb_localidade,
-    dt_hr_inicio TIMESTAMP,
-    dt_hr_fim    TIMESTAMP,
-    tratativa    TEXT,
-    km_viagem    VARCHAR DEFAULT 'Não informado',
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive   BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    id_caminhao      INTEGER NOT NULL REFERENCES tb_caminhao,
+    id_usuario       INTEGER REFERENCES tb_usuario,
+    id_origem        INTEGER REFERENCES tb_localidade,
+    id_destino       INTEGER REFERENCES tb_localidade,
+    dt_hr_inicio     TIMESTAMP,
+    dt_hr_fim        TIMESTAMP,
+    tratativa        TEXT,
+    km_viagem        VARCHAR DEFAULT 'Não informado',
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isinactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -181,8 +181,8 @@ CREATE TABLE tb_infracao (
     latitude           NUMERIC(9, 7),
     longitude          NUMERIC(9, 7),
     velocidade_kmh     NUMERIC(5, 2),
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_made   VARCHAR(20),
+    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive         BOOLEAN DEFAULT FALSE
 );
 
@@ -190,22 +190,22 @@ CREATE TABLE tb_infracao (
 -- MÍDIA DE OCORRÊNCIA
 -- =============================
 CREATE TABLE tb_midia_infracao (
-    id             SERIAL PRIMARY KEY,
-    id_infracao    INTEGER NOT NULL REFERENCES tb_infracao,
-    arquivo        VARCHAR(250) NOT NULL,
-    duracao_clipe  NUMERIC(6, 2),
-    dt_hr_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    isinactive     BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    id_infracao      INTEGER NOT NULL REFERENCES tb_infracao,
+    arquivo          VARCHAR(250) NOT NULL,
+    duracao_clipe    NUMERIC(6, 2),
+    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isinactive       BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
 -- ACESSOS
 -- =============================
 CREATE TABLE lg_login_usuario (
-    id         SERIAL PRIMARY KEY,
-    id_usuario INTEGER REFERENCES tb_usuario,
+    id          SERIAL PRIMARY KEY,
+    id_usuario  INTEGER REFERENCES tb_usuario,
     dt_hr_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -213,7 +213,7 @@ CREATE TABLE lg_login_usuario (
 -- DAU
 -- =============================
 CREATE TABLE tb_daily_active_users (
-    data DATE PRIMARY KEY,
+    data         DATE PRIMARY KEY,
     qtd_usuarios INT DEFAULT 0
 );
 
