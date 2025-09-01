@@ -32,6 +32,8 @@ drop view if exists vw_ocorrencia_por_viagem;
 CREATE TABLE tb_tipo_gravidade (
     id         INTEGER PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -40,6 +42,8 @@ CREATE TABLE tb_tipo_infracao (
     nome       VARCHAR(50) NOT NULL UNIQUE,
     pontuacao  INTEGER NOT NULL,
     id_tipo_gravidade INTEGER REFERENCES tb_tipo_gravidade,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -49,6 +53,8 @@ CREATE TABLE tb_localidade (
     numero_rua INTEGER,
     uf_estado  VARCHAR(2),
     nome       VARCHAR(80) NOT NULL UNIQUE,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -56,6 +62,8 @@ CREATE TABLE tb_tipo_risco (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
     descricao  TEXT,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -65,6 +73,8 @@ CREATE TABLE tb_tipo_risco (
 CREATE TABLE tb_segmento (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(40) NOT NULL UNIQUE,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -74,6 +84,8 @@ CREATE TABLE tb_unidade (
     nome        VARCHAR(100) NOT NULL,
     cidade      VARCHAR(50) NOT NULL,
     uf_estado   VARCHAR(2),
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive  BOOLEAN DEFAULT FALSE
 );
 
@@ -83,6 +95,8 @@ CREATE TABLE tb_unidade (
 CREATE TABLE tb_cargo (
     id         SERIAL PRIMARY KEY,
     nome       VARCHAR(255) NOT NULL UNIQUE,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive BOOLEAN DEFAULT FALSE
 );
 
@@ -97,6 +111,8 @@ CREATE TABLE tb_usuario (
     hash_senha     VARCHAR(100) NOT NULL,
     url_foto       VARCHAR(255) DEFAULT 'Sem foto',
     id_cargo       INTEGER NOT NULL REFERENCES tb_cargo,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive     BOOLEAN DEFAULT FALSE
 );
 
@@ -112,6 +128,8 @@ CREATE TABLE tb_caminhao (
     modelo         VARCHAR(80) DEFAULT 'Não informado',
     ano_fabricacao INTEGER,
     numero_frota   INTEGER NOT NULL,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive     BOOLEAN DEFAULT FALSE
 );
 
@@ -128,6 +146,8 @@ CREATE TABLE tb_motorista (
     email_empresa VARCHAR(150),
     id_tipo_risco INTEGER REFERENCES tb_tipo_risco,
     url_foto      VARCHAR(255) DEFAULT 'Sem foto',
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive    BOOLEAN DEFAULT FALSE
 );
 
@@ -144,6 +164,8 @@ CREATE TABLE tb_viagem (
     dt_hr_fim    TIMESTAMP,
     tratativa    TEXT,
     km_viagem    VARCHAR DEFAULT 'Não informado',
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive   BOOLEAN DEFAULT FALSE
 );
 
@@ -159,6 +181,8 @@ CREATE TABLE tb_infracao (
     latitude           NUMERIC(9, 7),
     longitude          NUMERIC(9, 7),
     velocidade_kmh     NUMERIC(5, 2),
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive         BOOLEAN DEFAULT FALSE
 );
 
@@ -171,6 +195,8 @@ CREATE TABLE tb_midia_infracao (
     arquivo        VARCHAR(250) NOT NULL,
     duracao_clipe  NUMERIC(6, 2),
     dt_hr_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isinactive     BOOLEAN DEFAULT FALSE
 );
 
