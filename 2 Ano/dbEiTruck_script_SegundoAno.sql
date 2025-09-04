@@ -164,6 +164,7 @@ CREATE TABLE tb_viagem (
     dt_hr_fim        TIMESTAMP,
     tratativa        TEXT,
     km_viagem        VARCHAR DEFAULT 'Não informado',
+    was_analyzed     BOOLEAN DEFAULT FALSE,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_inactive       BOOLEAN DEFAULT FALSE
