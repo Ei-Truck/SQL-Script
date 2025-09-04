@@ -152,6 +152,21 @@ CREATE TABLE tb_motorista (
 );
 
 -- =============================
+-- TRATATIVA
+-- =============================
+CREATE TABLE tb_registro (
+    id               SERIAL PRIMARY KEY,
+    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
+    id_motorista     INTEGER REFERENCES tb_motorista,
+    tratativa        TEXT NOT NULL,
+    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
+);
+
+
+-- =============================
 -- VIAGEM
 -- =============================
 CREATE TABLE tb_viagem (
@@ -162,7 +177,6 @@ CREATE TABLE tb_viagem (
     id_destino       INTEGER REFERENCES tb_localidade,
     dt_hr_inicio     TIMESTAMP,
     dt_hr_fim        TIMESTAMP,
-    tratativa        TEXT,
     km_viagem        VARCHAR DEFAULT 'Não informado',
     was_analyzed     BOOLEAN DEFAULT FALSE,
     transaction_made VARCHAR(20),
