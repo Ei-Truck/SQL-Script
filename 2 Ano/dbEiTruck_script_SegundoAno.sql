@@ -474,7 +474,7 @@ $$;
 CREATE OR REPLACE FUNCTION fn_atualizar_dau()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO tb_dau (data, qtd_usuarios)
+    INSERT INTO tb_daily_active_users (data, qtd_usuarios)
     VALUES (
         CURRENT_DATE,
         (SELECT COUNT(DISTINCT id_usuario)
