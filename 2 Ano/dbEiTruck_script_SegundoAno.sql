@@ -152,21 +152,6 @@ CREATE TABLE tb_motorista (
 );
 
 -- =============================
--- TRATATIVA
--- =============================
-CREATE TABLE tb_registro (
-    id               SERIAL PRIMARY KEY,
-    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
-    id_motorista     INTEGER REFERENCES tb_motorista,
-    tratativa        TEXT NOT NULL,
-    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    transaction_made VARCHAR(20),
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive      BOOLEAN DEFAULT FALSE
-);
-
-
--- =============================
 -- VIAGEM
 -- =============================
 CREATE TABLE tb_viagem (
@@ -182,6 +167,20 @@ CREATE TABLE tb_viagem (
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_inactive       BOOLEAN DEFAULT FALSE
+);
+
+-- =============================
+-- TRATATIVA
+-- =============================
+CREATE TABLE tb_registro (
+    id               SERIAL PRIMARY KEY,
+    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
+    id_motorista     INTEGER REFERENCES tb_motorista,
+    tratativa        TEXT NOT NULL,
+    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -396,7 +395,7 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO midia_ocorrencia (id, id_ocorrencia, caminho_arquivo, tamanho_mb, data_upload) VALUES
+INSERT INTO tb_midia_infracao (id, id_ocorrencia, caminho_arquivo, tamanho_mb, data_upload) VALUES
 (1, 1, 'ocorrencia1.mp4', 12.50, '2023-01-10 10:30:00'),
 (2, 2, 'ocorrencia2.mp4', 8.75, '2023-02-15 14:45:00'),
 (3, 3, 'ocorrencia3.mp4', 15.20, '2023-03-20 09:00:00'),
