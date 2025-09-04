@@ -235,6 +235,8 @@ CREATE TABLE tb_daily_active_users (
 -- =============================
 -- LOAD
 -- =============================
+
+-- 1) TIPO_GRAVIDADE
 INSERT INTO tb_tipo_gravidade(id, nome, is_inactive) VALUES
 (1, 'Leve', false),
 (2, 'Média', false),
@@ -355,18 +357,31 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (9, '1IWZZZ377VT004259', 9, 9, 'BRA4D55','Mercedes Axor', 2016, 109, false),
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110, false);
 
+-- 11) REGISTRO
+INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro, is_inactive) VALUES
+(1, 1, 1, 'Motorista orientado a reduzir velocidade.', '2023-01-10 12:00:00', false),
+(2, 2, 2, 'Frenagem brusca analisada, sem medidas adicionais.', '2023-02-15 14:30:00', false),
+(3, 3, 3, 'Aceleração brusca discutida em reunião de equipe.', '2023-03-05 15:45:00', false),
+(4, 4, 4, 'Colisão investigada, medidas corretivas implementadas.', '2023-04-12 10:15:00', false),
+(5, 5, 5, 'Pane mecânica registrada e encaminhada para manutenção.', '2023-05-20 16:20:00', false),
+(6, 6, 6, 'Desvio de rota revisado com o motorista.', '2023-06-18 18:00:00', false),
+(7, 7, 7, 'Falha de comunicação abordada em treinamento.', '2023-07-01 13:30:00', false),
+(8, 8, 8, 'Carga violada reportada às autoridades competentes.', '2023-08-08 11:45:00', false),
+(9, 9, 9, 'Parada não autorizada discutida com o motorista.', '2023-09-22 14:10:00', false),
+(10, 10, 10,'Uso não autorizado do veículo investigado.', '2023-10-05 15:55:00', false);
+
 -- 12) VIAGEM
-INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, tratativa, is_inactive) VALUES
-(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', 'Registro sem ação.', false),
-(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00',  'Motorista advertido verbalmente.', false),
-(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00',  'Encaminhar para treinamento.', false),
-(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00',  'Suspensão de 3 dias.', false),
-(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00',  'Multa de R$ 500,00 aplicada.', false),
-(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00',  'Enviar veículo para revisão.', false),
-(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00',  'Seguro acionado.', false),
-(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00',  'Ocorrência encerrada.', false),
-(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00',  'Encaminhado à polícia.', false),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00',  'Rota alterada conforme recomendação.', false);
+INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim, is_inactive) VALUES
+(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00', false),
+(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00', false),
+(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00', false),
+(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00', false),
+(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00', false),
+(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00', false),
+(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00', false),
+(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00', false),
+(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00', false),
+(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00', false);
 
 -- 13) OCORRENCIA
 INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh, is_inactive) VALUES
