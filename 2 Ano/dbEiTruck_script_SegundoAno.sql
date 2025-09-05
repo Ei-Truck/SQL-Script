@@ -355,6 +355,19 @@ INSERT INTO tb_caminhao (id, chassi, id_segmento, id_unidade, placa, modelo, ano
 (9, '1IWZZZ377VT004259', 9, 9, 'BRA4D55','Mercedes Axor', 2016, 109),
 (10, '0JWZZZ377VT004260', 10, 10,'BRA4D57', 'Volkswagen Constellation', 2015, 110);
 
+-- 12) VIAGEM
+INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim) VALUES
+(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00'),
+(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00'),
+(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00'),
+(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00'),
+(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00'),
+(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00'),
+(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00'),
+(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00'),
+(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00'),
+(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00');
+
 -- 11) REGISTRO
 INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro) VALUES
 (1, 1, 1, 'Motorista orientado a reduzir velocidade.', '2023-01-10 12:00:00'),
@@ -368,18 +381,6 @@ INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro)
 (9, 9, 9, 'Parada não autorizada discutida com o motorista.', '2023-09-22 14:10:00'),
 (10, 10, 10,'Uso não autorizado do veículo investigado.', '2023-10-05 15:55:00');
 
--- 12) VIAGEM
-INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr_inicio, dt_hr_fim) VALUES
-(1, 1, 1, 1, 2, '2023-01-10 08:00:00', '2023-01-10 14:00:00'),
-(2, 2, 2, 2, 3, '2023-02-15 09:15:00', '2023-02-15 16:40:00'),
-(3, 3, 3, 3, 4, '2023-03-05 07:30:00', '2023-03-05 19:20:00'),
-(4, 4, 4, 4, 5, '2023-04-12 06:50:00', '2023-04-12 13:45:00'),
-(5, 5, 5, 5, 6, '2023-05-20 08:10:00', '2023-05-20 15:55:00'),
-(6, 6, 6, 6, 7, '2023-06-18 10:00:00', '2023-06-18 17:40:00'),
-(7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00'),
-(8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00'),
-(9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00'),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00');
 
 -- 13) OCORRENCIA
 INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infracao, latitude, longitude, velocidade_kmh) VALUES
