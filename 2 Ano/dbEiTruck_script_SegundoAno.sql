@@ -484,6 +484,41 @@ JOIN tb_viagem v ON o.id_viagem = v.id
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id, t.nome;
 
+CREATE VIEW vw_motorista_pontuacao_mensal(
+    id_motorista,
+    motorista,
+    unidade,
+    segmento,
+    pontuacao_ultimo_mes
+) AS
+SELECT 
+    m.id AS id_motorista, 
+    m.nome_completo AS motorista, 
+    u.id AS id_unidade, 
+    u.nome AS unidade, 
+    s.id as id_segmento, 
+    s.nome AS segmento, 
+    SUM(ti.pontuacao) AS pontuacao_ultimo_mes 
+FROM tb_infracao i
+JOIN public.tb_motorista m ON i.id_motorista = m.id
+JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
+JOIN public.tb_unidade u ON m.id_unidade = u.id
+JOIN public.tb_segmento s ON u.id_segmento = s.id
+WHERE i.dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month'
+GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome;
+
+CREATE VIEW vw_relatorio_semanal_infracoes(
+    dia_semana,
+    total_infracoes
+) AS 
+SELECT 
+    TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
+    COUNT(*) AS total_infracoes
+FROM tb_infracao i
+WHERE dt_hr_evento >= CURRENT_DATE - interval '1 week'
+GROUP BY TO_CHAR(dt_hr_evento, 'FMDay')
+ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
+
 -- =============================
 -- PROCS
 -- =============================
