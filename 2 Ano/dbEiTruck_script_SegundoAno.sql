@@ -25,6 +25,12 @@ drop table if exists tb_daily_active_users cascade;
 drop view if exists vw_relatorio_simples_viagem;
 drop view if exists vw_visao_basica_viagem;
 drop view if exists vw_ocorrencia_por_viagem;
+drop view if exists vw_motorista_pontuacao_mensal;
+drop view if exists vw_relatorio_semanal_infracoes;
+drop procedure if exists prc_registrar_login_usuario;
+drop function if exists fn_atualizar_dau;
+drop trigger if exists trg_atualizar_dau on lg_login_usuario;
+
 
 -- =============================
 -- STATUS E TABELAS DE APOIO
@@ -487,18 +493,20 @@ GROUP BY v.id, t.nome;
 CREATE VIEW vw_motorista_pontuacao_mensal(
     id_motorista,
     motorista,
+    id_unidade,
     unidade,
+    id_segmento,
     segmento,
     pontuacao_ultimo_mes
 ) AS
-SELECT 
-    m.id AS id_motorista, 
-    m.nome_completo AS motorista, 
-    u.id AS id_unidade, 
-    u.nome AS unidade, 
-    s.id as id_segmento, 
-    s.nome AS segmento, 
-    SUM(ti.pontuacao) AS pontuacao_ultimo_mes 
+SELECT
+    m.id AS id_motorista,
+    m.nome_completo AS motorista,
+    u.id AS id_unidade,
+    u.nome AS unidade,
+    s.id as id_segmento,
+    s.nome AS segmento,
+    SUM(ti.pontuacao) AS pontuacao_ultimo_mes
 FROM tb_infracao i
 JOIN public.tb_motorista m ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
@@ -506,6 +514,7 @@ JOIN public.tb_unidade u ON m.id_unidade = u.id
 JOIN public.tb_segmento s ON u.id_segmento = s.id
 WHERE i.dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month'
 GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome;
+
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
     dia_semana,
