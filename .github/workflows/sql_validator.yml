@@ -1,0 +1,51 @@
+name: SQL Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**.sql'
+      - '.github/workflows/sql_validator.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**.sql'
+      - '.github/workflows/sql_validator.yml'
+
+jobs:
+  run-sql:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: pass
+          POSTGRES_DB: testdb
+        ports: [5432:5432]
+        options: >-
+          --health-cmd="pg_isready -U user -d testdb"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Wait for DB
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -U user -d testdb && break
+            echo "Waiting for DB..."
+            sleep 5
+          done
+
+      - name: Run all SQL scripts
+        run: |
+          set -e
+          find . -type f -name "*.sql" | while read file; do
+            echo ">>> Running $file"
+            PGPASSWORD=pass psql -h localhost -U user -d testdb -f "$file"
+          done
