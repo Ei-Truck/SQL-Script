@@ -39,12 +39,13 @@ jobs:
           for i in {1..10}; do
             pg_isready -h localhost -U user -d testdb && break
             echo "Waiting for DB..."
-            sleep 8
+            sleep 5
           done
 
-      - name: Run SQL scripts
+      - name: Run all SQL scripts
         run: |
-          for file in **.sql; do
+          set -e
+          find . -type f -name "*.sql" | while read file; do
             echo ">>> Running $file"
             PGPASSWORD=pass psql -h localhost -U user -d testdb -f "$file"
           done
