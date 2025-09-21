@@ -44,7 +44,7 @@ jobs:
 
       - name: Run SQL scripts
         run: |
-          for file in scripts/*.sql; do
+          for file in **.sql; do
             echo ">>> Running $file"
             PGPASSWORD=pass psql -h localhost -U user -d testdb -f "$file"
           done
