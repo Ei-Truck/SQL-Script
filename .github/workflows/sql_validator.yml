@@ -5,12 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - '**.sql'
-      - '.github/workflows/sql-pipeline.yml'
+      - '.github/workflows/sql_validator.yml'
   pull_request:
     branches: [ "main" ]
     paths:
       - '**.sql'
-      - '.github/workflows/sql-pipeline.yml'
+      - '.github/workflows/sql_validator.yml'
 
 jobs:
   run-sql:
