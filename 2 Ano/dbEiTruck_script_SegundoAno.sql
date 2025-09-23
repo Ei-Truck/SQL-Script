@@ -212,9 +212,7 @@ CREATE TABLE tb_infracao (
 CREATE TABLE tb_midia_infracao (
     id               SERIAL PRIMARY KEY,
     id_infracao      INTEGER NOT NULL REFERENCES tb_infracao,
-    arquivo          VARCHAR(250) NOT NULL,
-    duracao_clipe    NUMERIC(6, 2),
-    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    url              text NOT NULL,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_inactive       BOOLEAN DEFAULT FALSE
@@ -402,17 +400,17 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro) VALUES
-(1, 1, 'ocorrencia1.mp4', 12.50, '2023-01-10 10:30:00'),
-(2, 2, 'ocorrencia2.mp4', 8.75, '2023-02-15 14:45:00'),
-(3, 3, 'ocorrencia3.mp4', 15.20, '2023-03-20 09:00:00'),
-(4, 4, 'ocorrencia4.mp4', 6.80, '2023-04-05 16:20:00'),
-(5, 5, 'ocorrencia5.mp4', 22.10, '2023-05-12 11:15:00'),
-(6, 6, 'ocorrencia6.mp4', 18.75, '2023-06-18 13:40:00'),
-(7, 7, 'ocorrencia7.mp4', 16.40, '2023-07-01 11:05:00'),
-(8, 8, 'ocorrencia8.mp4', 9.90, '2023-08-08 08:35:00'),
-(9, 9, 'ocorrencia9.mp4', 14.25, '2023-09-22 10:25:00'),
-(10, 10, 'ocorrencia10.mp4', 11.10, '2023-10-05 12:50:00');
+INSERT INTO tb_midia_infracao (id, id_infracao, url) VALUES
+(1, 1, 'http://eitruck/video1.mp4'),
+(2, 2, 'http://eitruck/video2.mp4'),
+(3, 3, 'http://eitruck/video3.mp4'),
+(4, 4, 'http://eitruck/video4.mp4'),
+(5, 5, 'http://eitruck/video5.mp4'),
+(6, 6, 'http://eitruck/video6.mp4'),
+(7, 7, 'http://eitruck/video7.mp4'),
+(8, 8, 'http://eitruck/video8.mp4'),
+(9, 9, 'http://eitruck/video9.mp4'),
+(10, 10, 'http://eitruck/video10.mp4');
 
 -- =============================
 -- VIEWS
