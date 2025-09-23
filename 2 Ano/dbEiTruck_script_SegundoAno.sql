@@ -418,7 +418,6 @@ INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_re
 -- VIEWS
 -- =============================
 CREATE VIEW vw_relatorio_simples_viagem (
-    total_infracoes,
     placa_caminhao,
     data_inicio_viagem,
     id_infracao,
@@ -427,7 +426,6 @@ CREATE VIEW vw_relatorio_simples_viagem (
     id_caminhao
 ) AS
 SELECT
-    COUNT(o.id)     AS total_infracoes,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     o.id            AS id_infracao,
@@ -444,7 +442,6 @@ CREATE VIEW vw_visao_basica_viagem (
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
-    total_infracoes,
     nome_motorista,
     risco_motorista,
     id_viagem,
@@ -458,7 +455,6 @@ SELECT
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
-    COUNT(o.id)     AS total_infracoes,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
     v.id            AS id_viagem,
