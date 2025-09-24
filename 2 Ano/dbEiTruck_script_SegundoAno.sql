@@ -216,9 +216,10 @@ CREATE TABLE tb_midia_infracao (
     id_infracao      INTEGER NOT NULL REFERENCES tb_infracao,
     id_motorista     INTEGER NOT NULL REFERENCES tb_motorista,
     url              text NOT NULL,
+    is_concat        BOOLEAN DEFAULT FALSE,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive       BOOLEAN DEFAULT FALSE
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
