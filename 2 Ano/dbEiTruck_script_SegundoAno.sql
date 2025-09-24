@@ -7,6 +7,7 @@ BEGIN;
 -- =============================
 
 drop table if exists tb_midia_infracao cascade;
+drop table if exists tb_midia_concatenada cascade;
 drop table if exists tb_registro cascade;
 drop table if exists tb_infracao cascade;
 drop table if exists tb_tipo_infracao cascade;
@@ -211,7 +212,23 @@ CREATE TABLE tb_infracao (
 -- =============================
 CREATE TABLE tb_midia_infracao (
     id               SERIAL PRIMARY KEY,
+    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
     id_infracao      INTEGER NOT NULL REFERENCES tb_infracao,
+    id_motorista     INTEGER NOT NULL REFERENCES tb_motorista,
+    url              text NOT NULL,
+    is_concat        BOOLEAN DEFAULT FALSE,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
+);
+
+-- =============================
+-- MÍDIA CONCATENADA
+-- =============================
+CREATE TABLE tb_midia_concatenada (
+    id               SERIAL PRIMARY KEY,
+    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
+    id_motorista     INTEGER NOT NULL REFERENCES tb_motorista,
     url              text NOT NULL,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -400,17 +417,30 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO tb_midia_infracao (id, id_infracao, url) VALUES
-(1, 1, 'http://eitruck/video1.mp4'),
-(2, 2, 'http://eitruck/video2.mp4'),
-(3, 3, 'http://eitruck/video3.mp4'),
-(4, 4, 'http://eitruck/video4.mp4'),
-(5, 5, 'http://eitruck/video5.mp4'),
-(6, 6, 'http://eitruck/video6.mp4'),
-(7, 7, 'http://eitruck/video7.mp4'),
-(8, 8, 'http://eitruck/video8.mp4'),
-(9, 9, 'http://eitruck/video9.mp4'),
-(10, 10, 'http://eitruck/video10.mp4');
+INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VALUES
+(1, 1, 1, 1, 'http://eitruck/video1.mp4'),
+(2, 2, 2, 2, 'http://eitruck/video2.mp4'),
+(3, 3, 3, 3, 'http://eitruck/video3.mp4'),
+(4, 4, 4, 4, 'http://eitruck/video4.mp4'),
+(5, 5, 5, 5, 'http://eitruck/video5.mp4'),
+(6, 6, 6, 6, 'http://eitruck/video6.mp4'),
+(7, 7, 7, 7, 'http://eitruck/video7.mp4'),
+(8, 8, 8, 8, 'http://eitruck/video8.mp4'),
+(9, 9, 9, 9, 'http://eitruck/video9.mp4'),
+(10, 10, 10, 10, 'http://eitruck/video10.mp4');
+
+-- 15) MÍDIA CONCATENADA
+INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
+(1, 1, 1, 'http://eitruck/concat_video1.mp4'),
+(2, 2, 2, 'http://eitruck/concat_video2.mp4'),
+(3, 3, 3, 'http://eitruck/concat_video3.mp4'),
+(4, 4, 4, 'http://eitruck/concat_video4.mp4'),
+(5, 5, 5, 'http://eitruck/concat_video5.mp4'),
+(6, 6, 6, 'http://eitruck/concat_video6.mp4'),
+(7, 7, 7, 'http://eitruck/concat_video7.mp4'),
+(8, 8, 8, 'http://eitruck/concat_video8.mp4'),
+(9, 9, 9, 'http://eitruck/concat_video9.mp4'),
+(10, 10, 10, 'http://eitruck/concat_video10.mp4');
 
 -- =============================
 -- VIEWS
