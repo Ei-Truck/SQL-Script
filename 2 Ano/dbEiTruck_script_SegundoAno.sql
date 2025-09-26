@@ -451,7 +451,10 @@ CREATE VIEW vw_relatorio_simples_viagem (
     id_infracao,
     id_viagem,
     id_motorista,
-    id_caminhao
+    nome_motorista,
+    id_caminhao,
+    km_viagem,
+    pontuacao_total
 ) AS
 SELECT
     c.placa         AS placa_caminhao,
@@ -459,11 +462,15 @@ SELECT
     o.id            AS id_infracao,
     v.id            AS id_viagem,
     m.id            AS id_motorista,
-    c.id            AS id_caminhao
+    m.nome_completo AS nome_motorista,
+    c.id            AS id_caminhao,
+    v.km_viagem     AS km_viagem,
+    SUM(ti.pontuacao) AS pontuacao_total
 FROM tb_infracao o
 JOIN tb_viagem v    ON o.id_viagem = v.id
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
 JOIN tb_motorista m ON m.id = o.id_motorista
+JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
 GROUP BY c.placa, v.dt_hr_inicio, m.id, o.id, v.id, c.id;
 
 CREATE VIEW vw_visao_basica_viagem (
