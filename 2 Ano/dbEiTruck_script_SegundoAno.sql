@@ -519,12 +519,10 @@ GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, v.id, m
 
 CREATE VIEW vw_ocorrencia_por_viagem (
     total_ocorrencias,
-    nome_tipo_ocorrencia,
     id_viagem
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
-    t.nome      AS nome_tipo_ocorrencia,
     v.id        AS id_viagem
 FROM tb_infracao o
 JOIN tb_viagem v ON o.id_viagem = v.id
