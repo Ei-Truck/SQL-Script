@@ -318,16 +318,9 @@ INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado) VALUES
 
 -- 6) CARGO
 INSERT INTO tb_cargo (id, nome) VALUES
-(1, 'Motorista'),
-(2, 'Supervisor de Frota'),
-(3, 'Mecânico'),
-(4, 'Analista de Risco'),
-(5, 'Coordenador de Operações'),
-(6, 'Gerente de Logística'),
-(7, 'Auxiliar Administrativo'),
-(8, 'Inspetor de Segurança'),
-(9, 'Encarregado de Manutenção'),
-(10, 'Diretor de Operações');
+(1, 'Gerente de Análise'),
+(2, 'Analista Regional'),
+(3, 'Analista Local');
 
 -- 7) USUARIO
 INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_cargo) VALUES
