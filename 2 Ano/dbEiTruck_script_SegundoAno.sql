@@ -86,14 +86,13 @@ CREATE TABLE tb_segmento (
 );
 
 CREATE TABLE tb_unidade (
-    id          SERIAL PRIMARY KEY,
-    id_segmento INTEGER REFERENCES tb_segmento,
-    nome        VARCHAR(100) NOT NULL,
-    cidade      VARCHAR(50) NOT NULL,
-    uf_estado   VARCHAR(2),
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive  BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    id_segmento      INTEGER REFERENCES tb_segmento,
+    nome             VARCHAR(100) NOT NULL,
+    id_localidade    INTEGER REFERENCES tb_localidade,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -305,17 +304,17 @@ INSERT INTO tb_segmento (id, nome) VALUES
 (10, 'Transporte Especial');
 
 -- 5) UNIDADE
-INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado) VALUES
-(1, 1, 'Unidade São Paulo', 'São Paulo', 'SP'),
-(2, 2, 'Unidade Campinas', 'Campinas', 'SP'),
-(3, 3, 'Unidade Rio', 'Rio de Janeiro', 'RJ'),
-(4, 4, 'Unidade Curitiba', 'Curitiba', 'PR'),
-(5, 5, 'Unidade BH', 'Belo Horizonte', 'MG'),
-(6, 6, 'Unidade Porto Alegre', 'Porto Alegre', 'RS'),
-(7, 7, 'Unidade Recife', 'Recife', 'PE'),
-(8, 8, 'Unidade Salvador', 'Salvador', 'BA'),
-(9, 9, 'Unidade Goiânia', 'Goiânia', 'GO'),
-(10, 10, 'Unidade Fortaleza', 'Fortaleza', 'CE');
+INSERT INTO tb_unidade (id, id_segmento, nome, id_localidade) VALUES
+(1, 1, 'Unidade São Paulo', 1),
+(2, 2, 'Unidade Campinas', 2),
+(3, 3, 'Unidade Rio', 3),
+(4, 4, 'Unidade Curitiba', 4),
+(5, 5, 'Unidade BH', 5),
+(6, 6, 'Unidade Porto Alegre', 6),
+(7, 7, 'Unidade Recife', 7),
+(8, 8, 'Unidade Salvador', 8),
+(9, 9, 'Unidade Goiânia', 9),
+(10, 10, 'Unidade Fortaleza', 10);
 
 -- 6) CARGO
 INSERT INTO tb_cargo (id, nome) VALUES
