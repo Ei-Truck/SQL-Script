@@ -523,6 +523,7 @@ JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id, t.nome;
 
 CREATE VIEW vw_motorista_pontuacao_mensal(
+    ranking_pontuacao,
     id_motorista,
     motorista,
     id_unidade,
@@ -532,6 +533,7 @@ CREATE VIEW vw_motorista_pontuacao_mensal(
     pontuacao_ultimo_mes
 ) AS
 SELECT
+    DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
     m.id AS id_motorista,
     m.nome_completo AS motorista,
     u.id AS id_unidade,
@@ -544,8 +546,11 @@ JOIN public.tb_motorista m ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
 JOIN public.tb_unidade u ON m.id_unidade = u.id
 JOIN public.tb_segmento s ON u.id_segmento = s.id
-WHERE i.dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month'
-GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome;
+WHERE
+    EXTRACT(MONTH FROM i.dt_hr_evento) >= EXTRACT(MONTH FROM current_date) - 1
+    AND EXTRACT(YEAR FROM i.dt_hr_evento) = EXTRACT(YEAR FROM current_date)
+GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome
+ORDER BY rank_pontuacao;
 
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
