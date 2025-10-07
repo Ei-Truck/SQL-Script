@@ -578,6 +578,175 @@ END;
 $$;
 
 -- =============================
+-- PROCS RPA
+-- =============================
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_segmento()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_segmento
+    SET nome = segmento_temp.nome, transaction_made = 'UPDATE', updated_at = CURRENT_DATE, is_inactive = FALSE
+    FROM segmento_temp
+    WHERE tb_segmento.id = segmento_temp.id;
+
+    UPDATE tb_segmento
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM segmento_temp WHERE segmento_temp.id = tb_segmento.id );
+
+    INSERT INTO tb_segmento (nome, transaction_made, updated_at, is_inactive)
+    SELECT segmento_temp.nome, 'INSERT', CURRENT_DATE, FALSE
+    FROM segmento_temp
+    WHERE NOT EXISTS( SELECT 1 FROM tb_segmento WHERE segmento_temp.id = tb_segmento.id );
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_endereco()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_localidade
+    SET cep = endereco_temp.cep, numero_rua = endereco_temp.numero, nome = endereco_temp.cidade, uf_estado = endereco_temp.estado, transaction_made = 'UPDATE', updated_at = CURRENT_DATE, is_inactive = FALSE
+    FROM endereco_temp
+    WHERE tb_localidade.id = endereco_temp.id;
+
+    UPDATE tb_localidade
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM endereco_temp WHERE endereco_temp.id = tb_localidade.id );
+
+    INSERT INTO tb_localidade (cep, numero_rua, uf_estado, nome, transaction_made, updated_at, is_inactive)
+    SELECT endereco_temp.cep, endereco_temp.numero, endereco_temp.estado, endereco_temp.cidade,'INSERT', CURRENT_DATE, FALSE
+    FROM endereco_temp
+    WHERE NOT EXISTS( SELECT 1 FROM tb_localidade WHERE endereco_temp.id = tb_localidade.id );
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_unidade()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_unidade
+    SET nome = unidade_temp.nome, id_segmento = unidade_temp.id_segmento, id_localidade = unidade_temp.id_endereco, transaction_made = 'UPDATE', updated_at = CURRENT_DATE, is_inactive = FALSE
+    FROM unidade_temp
+    WHERE tb_unidade.id = unidade_temp.id;
+
+    UPDATE tb_unidade
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM unidade_temp WHERE unidade_temp.id = tb_unidade.id );
+
+    INSERT INTO tb_unidade (nome, id_segmento, id_localidade, transaction_made, updated_at, is_inactive)
+    SELECT unidade_temp.nome, unidade_temp.id_segmento, unidade_temp.id_endereco, 'INSERT', CURRENT_DATE, FALSE
+    FROM unidade_temp
+    WHERE NOT EXISTS( SELECT 1 FROM tb_unidade WHERE unidade_temp.id = tb_unidade.id );
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_tipo_ocorrencia()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_tipo_infracao
+    SET
+        pontuacao = tipo_infracao_temp.pontuacao,
+        nome = tipo_infracao_temp.tipo_evento,
+        id_tipo_gravidade = (select id from tb_tipo_gravidade where tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome),
+        transaction_made = 'UPDATE',
+        updated_at = CURRENT_DATE,
+        is_inactive = FALSE
+    FROM tipo_infracao_temp
+    WHERE tb_tipo_infracao.id = tipo_infracao_temp.id;
+
+    UPDATE tb_tipo_infracao
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM tipo_infracao_temp WHERE tipo_infracao_temp.id = tb_tipo_infracao.id );
+
+    INSERT INTO tb_tipo_gravidade (nome, transaction_made, updated_at, is_inactive)
+    SELECT tipo_infracao_temp.gravidade, 'INSERT', CURRENT_DATE, FALSE
+    FROM tipo_infracao_temp
+    WHERE NOT EXISTS( SELECT nome FROM tb_tipo_gravidade WHERE tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome );
+
+    INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade, transaction_made, updated_at, is_inactive)
+    SELECT tipo_infracao_temp.tipo_evento, tipo_infracao_temp.pontuacao, tb_tipo_gravidade.id, 'INSERT', CURRENT_DATE, FALSE
+    FROM tipo_infracao_temp
+    JOIN tb_tipo_gravidade on tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome
+
+    WHERE NOT EXISTS( SELECT 1 FROM tb_tipo_infracao WHERE tipo_infracao_temp.id = tb_tipo_infracao.id );
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_analista()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_usuario
+    SET
+        cpf = analista_temp.cpf,
+        id_unidade = analista_temp.id_unidade,
+        dt_contratacao = analista_temp.dt_contratacao,
+        nome_completo = analista_temp.nome_completo,
+        telefone = analista_temp.telefone,
+        email = analista_temp.email,
+        hash_senha = analista_temp.senha,
+        id_cargo = (select id from tb_cargo where analista_temp.cargo = tb_cargo.nome),
+        transaction_made = 'UPDATE',
+        updated_at = CURRENT_DATE,
+        is_inactive = FALSE
+    FROM analista_temp
+    WHERE tb_usuario.id = analista_temp.id;
+
+    UPDATE tb_usuario
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM analista_temp WHERE analista_temp.id = tb_usuario.id );
+
+    INSERT INTO tb_cargo (nome, transaction_made, updated_at, is_inactive)
+    SELECT analista_temp.cargo, 'INSERT', CURRENT_DATE, FALSE
+    FROM analista_temp
+    WHERE NOT EXISTS( SELECT nome FROM tb_cargo WHERE analista_temp.cargo = tb_cargo.nome );
+
+    INSERT INTO tb_usuario (cpf, id_unidade, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, transaction_made, updated_at, is_inactive)
+    SELECT analista_temp.cpf, analista_temp.id_unidade, analista_temp.dt_contratacao, analista_temp.nome, analista_temp.telefone, analista_temp.email, analista_temp.senha, tb_cargo.id, 'INSERT', CURRENT_DATE, FALSE
+    FROM analista_temp
+    JOIN tb_cargo on analista_temp.cargo = tb_cargo.nome
+    WHERE NOT EXISTS( SELECT 1 FROM tb_usuario WHERE analista_temp.id = tb_usuario.id );
+
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE prc_atualiza_administrador()
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE tb_usuario
+    SET
+        cpf = administrador_temp.cpf,
+        nome_completo = administrador_temp.nome_completo,
+        telefone = administrador_temp.telefone,
+        email = administrador_temp.email,
+        hash_senha = administrador_temp.senha,
+        id_cargo = 1,
+        transaction_made = 'UPDATE',
+        updated_at = CURRENT_DATE,
+        is_inactive = FALSE
+    FROM administrador_temp
+    WHERE tb_usuario.id = administrador_temp.id;
+
+    UPDATE tb_usuario
+    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
+    WHERE NOT EXISTS( SELECT 1 FROM administrador_temp WHERE administrador_temp.id = tb_usuario.id );
+
+    INSERT INTO tb_usuario (cpf, nome_completo, telefone, email, hash_senha, id_cargo, transaction_made, updated_at, is_inactive)
+    SELECT administrador_temp.cpf, administrador_temp.nome_completo, administrador_temp.telefone ,administrador_temp.email, administrador_temp.senha, 1, 'INSERT', CURRENT_DATE, FALSE
+    FROM administrador_temp
+    WHERE NOT EXISTS( SELECT 1 FROM tb_usuario WHERE administrador_temp.id = tb_usuario.id );
+END;
+$$;
+
+-- =============================
 -- FUNCS
 -- =============================
 CREATE OR REPLACE FUNCTION fn_atualizar_dau()
