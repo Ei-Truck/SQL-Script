@@ -318,22 +318,24 @@ INSERT INTO tb_unidade (id, id_segmento, nome, id_localidade) VALUES
 
 -- 6) CARGO
 INSERT INTO tb_cargo (id, nome) VALUES
-(1, 'Gerente de Análise'),
-(2, 'Analista Regional'),
-(3, 'Analista Local');
+(1, 'Administrador'),
+(2, 'Gerente de Análise'),
+(3, 'Analista Regional'),
+(4, 'Analista Local');
 
 -- 7) USUARIO
 INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
-(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', 'hash1', 2),
-(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', 'hash2', 3),
-(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', 'hash3', 1),
-(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', 'hash4', 2),
-(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', 'hash5', 1),
-(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', 'hash6', 3),
-(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', 'hash7', 3),
-(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', 'hash8', 2),
-(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', 'hash9', 1),
-(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', 'hash10', 1);
+(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', 'hash1', 3),
+(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', 'hash2', 4),
+(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', 'hash3', 2),
+(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', 'hash4', 3),
+(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', 'hash5', 2),
+(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', 'hash6', 4),
+(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', 'hash7', 4),
+(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', 'hash8', 3),
+(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', 'hash9', 2),
+(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', 'hash10', 2);
+
 
 -- 8) TIPO_RISCO
 INSERT INTO tb_tipo_risco (id, nome, descricao) VALUES
