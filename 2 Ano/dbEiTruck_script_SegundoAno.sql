@@ -439,24 +439,18 @@ INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
 -- VIEWS
 -- =============================
 CREATE VIEW vw_relatorio_simples_viagem (
+    id_viagem,
     placa_caminhao,
     data_inicio_viagem,
-    id_infracao,
-    id_viagem,
-    id_motorista,
     nome_motorista,
-    id_caminhao,
     km_viagem,
     pontuacao_total
 ) AS
 SELECT
+    v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
-    o.id            AS id_infracao,
-    v.id            AS id_viagem,
-    m.id            AS id_motorista,
     m.nome_completo AS nome_motorista,
-    c.id            AS id_caminhao,
     v.km_viagem     AS km_viagem,
     SUM(ti.pontuacao) AS pontuacao_total
 FROM tb_infracao o
@@ -467,38 +461,28 @@ JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
 GROUP BY c.placa, v.dt_hr_inicio, m.id, o.id, v.id, c.id;
 
 CREATE VIEW vw_visao_basica_viagem (
+    id_viagem,
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
     segmento,
     nome_motorista,
     risco_motorista,
-    id_midia_concatenada,
     url_midia_concatenada,
-    id_viagem,
-    id_segmento,
-    id_motorista,
-    id_tipo_gravidade,
-    id_tipo_risco,
-    id_infracao,
-    id_caminhao
+    tipo_gravidade,
+    tipo_infracao
 ) AS
 SELECT
+    v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
     s.nome          AS segmento,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
-    mc.id           AS id_midia_concatenada,
     mc.url          AS url_midia_concatenada,
-    v.id            AS id_viagem,
-    s.id            AS id_segmento,
-    m.id            AS id_motorista,
-    tg.id           AS id_tipo_gravidade,
-    tr.id           AS id_tipo_risco,
-    o.id            AS id_infracao,
-    c.id            AS id_caminhao
+    tg.nome         AS tipo_gravidade,
+    t.nome          AS tipo_infracao
 FROM tb_viagem v
 JOIN tb_infracao o ON o.id_viagem = v.id
 JOIN tb_motorista m ON m.id = o.id_motorista
@@ -508,11 +492,11 @@ JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
 JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
 JOIN tb_segmento s ON s.id = m.id_unidade
 JOIN tb_caminhao c ON c.id = v.id_caminhao
-GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, v.id, m.id, tr.id, tg.id, o.id, c.id, s.nome, s.id, mc.id, mc.url;
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, tg.id, s.nome, mc.url, t.nome;
 
 CREATE VIEW vw_ocorrencia_por_viagem (
-    total_ocorrencias,
-    id_viagem
+    id_viagem,
+    total_ocorrencias
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
@@ -524,21 +508,15 @@ GROUP BY v.id, t.nome;
 
 CREATE VIEW vw_motorista_pontuacao_mensal(
     ranking_pontuacao,
-    id_motorista,
     motorista,
-    id_unidade,
     unidade,
-    id_segmento,
     segmento,
     pontuacao_ultimo_mes
 ) AS
 SELECT
     DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
-    m.id AS id_motorista,
     m.nome_completo AS motorista,
-    u.id AS id_unidade,
     u.nome AS unidade,
-    s.id as id_segmento,
     s.nome AS segmento,
     SUM(ti.pontuacao) AS pontuacao_ultimo_mes
 FROM tb_infracao i
