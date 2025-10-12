@@ -7,7 +7,6 @@ BEGIN;
 -- =============================
 
 drop table if exists tb_midia_infracao cascade;
-drop table if exists tb_midia_concatenada cascade;
 drop table if exists tb_registro cascade;
 drop table if exists tb_infracao cascade;
 drop table if exists tb_tipo_infracao cascade;
@@ -86,13 +85,14 @@ CREATE TABLE tb_segmento (
 );
 
 CREATE TABLE tb_unidade (
-    id               SERIAL PRIMARY KEY,
-    id_segmento      INTEGER REFERENCES tb_segmento,
-    nome             VARCHAR(100) NOT NULL,
-    id_localidade    INTEGER REFERENCES tb_localidade,
-    transaction_made VARCHAR(20),
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive      BOOLEAN DEFAULT FALSE
+    id          SERIAL PRIMARY KEY,
+    id_segmento INTEGER REFERENCES tb_segmento,
+    nome        VARCHAR(100) NOT NULL,
+    cidade      VARCHAR(50) NOT NULL,
+    uf_estado   VARCHAR(2),
+    transaction_made varchar(20),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive  BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -113,7 +113,6 @@ CREATE TABLE tb_usuario (
     id_perfil      INTEGER,
     dt_contratacao DATE,
     nome_completo  VARCHAR(150) NOT NULL,
-    telefone       VARCHAR(15) NOT NULL UNIQUE,
     email          VARCHAR(150) NOT NULL UNIQUE,
     hash_senha     VARCHAR(100) NOT NULL,
     url_foto       VARCHAR(255) DEFAULT 'Sem foto',
@@ -212,24 +211,10 @@ CREATE TABLE tb_infracao (
 -- =============================
 CREATE TABLE tb_midia_infracao (
     id               SERIAL PRIMARY KEY,
-    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
     id_infracao      INTEGER NOT NULL REFERENCES tb_infracao,
-    id_motorista     INTEGER NOT NULL REFERENCES tb_motorista,
-    url              text NOT NULL,
-    is_concat        BOOLEAN DEFAULT FALSE,
-    transaction_made VARCHAR(20),
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive      BOOLEAN DEFAULT FALSE
-);
-
--- =============================
--- MÍDIA CONCATENADA
--- =============================
-CREATE TABLE tb_midia_concatenada (
-    id               SERIAL PRIMARY KEY,
-    id_viagem        INTEGER NOT NULL REFERENCES tb_viagem,
-    id_motorista     INTEGER NOT NULL REFERENCES tb_motorista,
-    url              text NOT NULL,
+    arquivo          VARCHAR(250) NOT NULL,
+    duracao_clipe    NUMERIC(6, 2),
+    dt_hr_registro   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_inactive       BOOLEAN DEFAULT FALSE
@@ -304,38 +289,43 @@ INSERT INTO tb_segmento (id, nome) VALUES
 (10, 'Transporte Especial');
 
 -- 5) UNIDADE
-INSERT INTO tb_unidade (id, id_segmento, nome, id_localidade) VALUES
-(1, 1, 'Unidade São Paulo', 1),
-(2, 2, 'Unidade Campinas', 2),
-(3, 3, 'Unidade Rio', 3),
-(4, 4, 'Unidade Curitiba', 4),
-(5, 5, 'Unidade BH', 5),
-(6, 6, 'Unidade Porto Alegre', 6),
-(7, 7, 'Unidade Recife', 7),
-(8, 8, 'Unidade Salvador', 8),
-(9, 9, 'Unidade Goiânia', 9),
-(10, 10, 'Unidade Fortaleza', 10);
+INSERT INTO tb_unidade (id, id_segmento, nome, cidade, uf_estado) VALUES
+(1, 1, 'Unidade São Paulo', 'São Paulo', 'SP'),
+(2, 2, 'Unidade Campinas', 'Campinas', 'SP'),
+(3, 3, 'Unidade Rio', 'Rio de Janeiro', 'RJ'),
+(4, 4, 'Unidade Curitiba', 'Curitiba', 'PR'),
+(5, 5, 'Unidade BH', 'Belo Horizonte', 'MG'),
+(6, 6, 'Unidade Porto Alegre', 'Porto Alegre', 'RS'),
+(7, 7, 'Unidade Recife', 'Recife', 'PE'),
+(8, 8, 'Unidade Salvador', 'Salvador', 'BA'),
+(9, 9, 'Unidade Goiânia', 'Goiânia', 'GO'),
+(10, 10, 'Unidade Fortaleza', 'Fortaleza', 'CE');
 
 -- 6) CARGO
 INSERT INTO tb_cargo (id, nome) VALUES
-(1, 'Administrador'),
-(2, 'Gerente de Análise'),
-(3, 'Analista Regional'),
-(4, 'Analista Local');
+(1, 'Motorista'),
+(2, 'Supervisor de Frota'),
+(3, 'Mecânico'),
+(4, 'Analista de Risco'),
+(5, 'Coordenador de Operações'),
+(6, 'Gerente de Logística'),
+(7, 'Auxiliar Administrativo'),
+(8, 'Inspetor de Segurança'),
+(9, 'Encarregado de Manutenção'),
+(10, 'Diretor de Operações');
 
 -- 7) USUARIO
-INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
-(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', 'hash1', 3),
-(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', 'hash2', 4),
-(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', 'hash3', 2),
-(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', 'hash4', 3),
-(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', 'hash5', 2),
-(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', 'hash6', 4),
-(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', 'hash7', 4),
-(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', 'hash8', 3),
-(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', 'hash9', 2),
-(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', 'hash10', 2);
-
+INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, email, hash_senha, id_cargo) VALUES
+(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', 'joao.silva@empresa.com', 'hash1', 2),
+(2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', 'maria.oliveira@empresa.com', 'hash2', 4),
+(3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', 'carlos.souza@empresa.com', 'hash3', 6),
+(4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', 'fernanda.lima@empresa.com', 'hash4', 5),
+(5, '444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', 'ricardo.alves@empresa.com', 'hash5', 7),
+(6, '777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', 'paula.mendes@empresa.com', 'hash6', 8),
+(7, '222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', 'bruno.ferreira@empresa.com', 'hash7', 9),
+(8, '555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', 'aline.costa@empresa.com', 'hash8', 3),
+(9, '888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', 'gustavo.pereira@empresa.com', 'hash9', 10),
+(10, '666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', 'larissa.martins@empresa.com', 'hash10', 1);
 
 -- 8) TIPO_RISCO
 INSERT INTO tb_tipo_risco (id, nome, descricao) VALUES
@@ -382,7 +372,14 @@ INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr
 (7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00'),
 (8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00'),
 (9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00'),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00');
+(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00'),
+(11, 1, 1, 1, 2, '2025-10-04 08:00:00', '2025-10-04 12:00:00'),
+(12, 2, 2, 2, 3, '2025-10-05 09:00:00', '2025-10-05 13:30:00'),
+(13, 3, 3, 3, 4, '2025-10-06 07:30:00', '2025-10-06 11:50:00'),
+(14, 4, 4, 4, 5, '2025-10-07 06:40:00', '2025-10-07 12:10:00'),
+(15, 5, 5, 5, 6, '2025-10-08 08:20:00', '2025-10-08 13:15:00'),
+(16, 6, 6, 6, 7, '2025-10-10 09:10:00', '2025-10-10 14:50:00'),
+(17, 7, 7, 7, 8, '2025-10-11 07:50:00', '2025-10-11 12:30:00');
 
 -- 11) REGISTRO
 INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro) VALUES
@@ -409,76 +406,77 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (7, 7, 7, '2023-07-01 11:00:00', 8, -8.047562, -34.877000, 40.0),
 (8, 8, 8, '2023-08-08 08:30:00', 9, -12.977749, -38.501630, 55.0),
 (9, 9, 9, '2023-09-22 10:20:00', 10, -16.686882, -49.264788, 50.0),
-(10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0);
+(10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0),
+(11, 11, 1, '2025-10-04 09:15:00', 1, -23.550520, -46.633308, 98.2),
+(12, 11, 2, '2025-10-04 10:05:00', 6, -23.548900, -46.650000, NULL),
+(13, 12, 3, '2025-10-05 08:55:00', 2, -22.909938, -47.062633, 72.5),
+(14, 12, 1, '2025-10-05 11:10:00', 1, -22.910500, -47.060000, 105.0),
+(15, 12, 4, '2025-10-05 12:40:00', 5, -22.912000, -47.058000, 0.0),
+(16, 12, 5, '2025-10-05 14:20:00', 9, -22.913500, -47.057000, NULL),
+(17, 13, 6, '2025-10-06 07:30:00', 3, -22.906847, -43.172896, 88.7),
+(18, 13, 7, '2025-10-06 09:45:00', 2, -22.905000, -43.170000, 66.0),
+(19, 13, 8, '2025-10-06 13:20:00', 8, -22.904000, -43.168000, NULL),
+(20, 14, 9, '2025-10-07 10:05:00', 4, -25.428356, -49.273251, 40.0),
+(21, 14, 3, '2025-10-07 11:30:00', 1, -25.427000, -49.270000, 112.3),
+(22, 14, 2, '2025-10-07 14:50:00', 6, -25.426000, -49.275000, NULL),
+(23, 14, 1, '2025-10-07 16:10:00', 7, -25.425000, -49.276000, NULL),
+(24, 15, 4, '2025-10-08 06:20:00', 1, -19.916681, -43.934493, 95.0),
+(25, 15, 5, '2025-10-08 09:40:00', 10, -19.918000, -43.933000, NULL),
+(26, 15, 3, '2025-10-08 11:55:00', 2, -19.919000, -43.932000, 70.2),
+(27, 11, 6, '2025-10-09 08:15:00', 3, -30.034647, -51.217658, 82.5),
+(28, 12, 7, '2025-10-09 13:30:00', 9, -30.035000, -51.218000, NULL),
+(29, 16, 8, '2025-10-10 15:45:00', 1, -3.731862, -38.526669, 88.0),
+(30, 16, 9, '2025-10-11 10:20:00', 2, -12.977749, -38.501630, 60.3);
 
 -- 14) MÍDIA DA OCORRÊNCIA
-INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VALUES
-(1, 1, 1, 1, 'http://eitruck/video1.mp4'),
-(2, 2, 2, 2, 'http://eitruck/video2.mp4'),
-(3, 3, 3, 3, 'http://eitruck/video3.mp4'),
-(4, 4, 4, 4, 'http://eitruck/video4.mp4'),
-(5, 5, 5, 5, 'http://eitruck/video5.mp4'),
-(6, 6, 6, 6, 'http://eitruck/video6.mp4'),
-(7, 7, 7, 7, 'http://eitruck/video7.mp4'),
-(8, 8, 8, 8, 'http://eitruck/video8.mp4'),
-(9, 9, 9, 9, 'http://eitruck/video9.mp4'),
-(10, 10, 10, 10, 'http://eitruck/video10.mp4');
-
--- 15) MÍDIA CONCATENADA
-INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
-(1, 1, 1, 'http://eitruck/concat_video1.mp4'),
-(2, 2, 2, 'http://eitruck/concat_video2.mp4'),
-(3, 3, 3, 'http://eitruck/concat_video3.mp4'),
-(4, 4, 4, 'http://eitruck/concat_video4.mp4'),
-(5, 5, 5, 'http://eitruck/concat_video5.mp4'),
-(6, 6, 6, 'http://eitruck/concat_video6.mp4'),
-(7, 7, 7, 'http://eitruck/concat_video7.mp4'),
-(8, 8, 8, 'http://eitruck/concat_video8.mp4'),
-(9, 9, 9, 'http://eitruck/concat_video9.mp4'),
-(10, 10, 10, 'http://eitruck/concat_video10.mp4');
+INSERT INTO tb_midia_infracao (id, id_infracao, arquivo, duracao_clipe, dt_hr_registro) VALUES
+(1, 1, 'ocorrencia1.mp4', 12.50, '2023-01-10 10:30:00'),
+(2, 2, 'ocorrencia2.mp4', 8.75, '2023-02-15 14:45:00'),
+(3, 3, 'ocorrencia3.mp4', 15.20, '2023-03-20 09:00:00'),
+(4, 4, 'ocorrencia4.mp4', 6.80, '2023-04-05 16:20:00'),
+(5, 5, 'ocorrencia5.mp4', 22.10, '2023-05-12 11:15:00'),
+(6, 6, 'ocorrencia6.mp4', 18.75, '2023-06-18 13:40:00'),
+(7, 7, 'ocorrencia7.mp4', 16.40, '2023-07-01 11:05:00'),
+(8, 8, 'ocorrencia8.mp4', 9.90, '2023-08-08 08:35:00'),
+(9, 9, 'ocorrencia9.mp4', 14.25, '2023-09-22 10:25:00'),
+(10, 10, 'ocorrencia10.mp4', 11.10, '2023-10-05 12:50:00');
 
 -- =============================
 -- VIEWS
 -- =============================
 CREATE VIEW vw_relatorio_simples_viagem (
+    total_infracoes,
     placa_caminhao,
     data_inicio_viagem,
     id_infracao,
     id_viagem,
     id_motorista,
-    nome_motorista,
     id_caminhao,
-    km_viagem,
-    pontuacao_total
+    is_analisada
 ) AS
 SELECT
+    COUNT(o.id)     AS total_infracoes,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     o.id            AS id_infracao,
     v.id            AS id_viagem,
     m.id            AS id_motorista,
-    m.nome_completo AS nome_motorista,
     c.id            AS id_caminhao,
-    v.km_viagem     AS km_viagem,
-    SUM(ti.pontuacao) AS pontuacao_total
+    v.was_analyzed  AS is_analisada
 FROM tb_infracao o
 JOIN tb_viagem v    ON o.id_viagem = v.id
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
 JOIN tb_motorista m ON m.id = o.id_motorista
-JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
 GROUP BY c.placa, v.dt_hr_inicio, m.id, o.id, v.id, c.id;
 
 CREATE VIEW vw_visao_basica_viagem (
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
-    segmento,
+    total_infracoes,
     nome_motorista,
     risco_motorista,
-    id_midia_concatenada,
-    url_midia_concatenada,
     id_viagem,
-    id_segmento,
     id_motorista,
     id_tipo_gravidade,
     id_tipo_risco,
@@ -489,13 +487,10 @@ SELECT
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
-    s.nome          AS segmento,
+    COUNT(o.id)     AS total_infracoes,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
-    mc.id           AS id_midia_concatenada,
-    mc.url          AS url_midia_concatenada,
     v.id            AS id_viagem,
-    s.id            AS id_segmento,
     m.id            AS id_motorista,
     tg.id           AS id_tipo_gravidade,
     tr.id           AS id_tipo_risco,
@@ -507,17 +502,17 @@ JOIN tb_motorista m ON m.id = o.id_motorista
 JOIN tb_tipo_risco tr ON m.id_tipo_risco = tr.id
 JOIN tb_tipo_infracao t ON t.id = o.id_tipo_infracao
 JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
-JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
-JOIN tb_segmento s ON s.id = m.id_unidade
 JOIN tb_caminhao c ON c.id = v.id_caminhao
-GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, v.id, m.id, tr.id, tg.id, o.id, c.id, s.nome, s.id, mc.id, mc.url;
+GROUP BY c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, v.id, m.id, tr.id, tg.id, o.id, c.id;
 
 CREATE VIEW vw_ocorrencia_por_viagem (
     total_ocorrencias,
+    nome_tipo_ocorrencia,
     id_viagem
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
+    t.nome      AS nome_tipo_ocorrencia,
     v.id        AS id_viagem
 FROM tb_infracao o
 JOIN tb_viagem v ON o.id_viagem = v.id
@@ -525,7 +520,6 @@ JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id, t.nome;
 
 CREATE VIEW vw_motorista_pontuacao_mensal(
-    ranking_pontuacao,
     id_motorista,
     motorista,
     id_unidade,
@@ -535,7 +529,6 @@ CREATE VIEW vw_motorista_pontuacao_mensal(
     pontuacao_ultimo_mes
 ) AS
 SELECT
-    DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
     m.id AS id_motorista,
     m.nome_completo AS motorista,
     u.id AS id_unidade,
@@ -548,11 +541,8 @@ JOIN public.tb_motorista m ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
 JOIN public.tb_unidade u ON m.id_unidade = u.id
 JOIN public.tb_segmento s ON u.id_segmento = s.id
-WHERE
-    EXTRACT(MONTH FROM i.dt_hr_evento) >= EXTRACT(MONTH FROM current_date) - 1
-    AND EXTRACT(YEAR FROM i.dt_hr_evento) = EXTRACT(YEAR FROM current_date)
-GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome
-ORDER BY rank_pontuacao;
+WHERE i.dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month'
+GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome;
 
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
