@@ -382,7 +382,14 @@ INSERT INTO tb_viagem (id, id_caminhao, id_usuario, id_origem, id_destino, dt_hr
 (7, 7, 7, 7, 8, '2023-07-01 09:00:00', '2023-07-01 14:50:00'),
 (8, 8, 8, 8, 9, '2023-08-08 05:40:00', '2023-08-08 12:30:00'),
 (9, 9, 9, 9, 10, '2023-09-22 06:10:00', '2023-09-22 15:15:00'),
-(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00');
+(10, 10, 10, 10, 1, '2023-10-05 08:30:00', '2023-10-05 17:00:00'),
+(11, 1, 1, 1, 2, '2025-10-04 08:00:00', '2025-10-04 12:00:00'),
+(12, 2, 2, 2, 3, '2025-10-05 09:00:00', '2025-10-05 13:30:00'),
+(13, 3, 3, 3, 4, '2025-10-06 07:30:00', '2025-10-06 11:50:00'),
+(14, 4, 4, 4, 5, '2025-10-07 06:40:00', '2025-10-07 12:10:00'),
+(15, 5, 5, 5, 6, '2025-10-08 08:20:00', '2025-10-08 13:15:00'),
+(16, 6, 6, 6, 7, '2025-10-10 09:10:00', '2025-10-10 14:50:00'),
+(17, 7, 7, 7, 8, '2025-10-11 07:50:00', '2025-10-11 12:30:00');
 
 -- 11) REGISTRO
 INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro) VALUES
@@ -409,7 +416,27 @@ INSERT INTO tb_infracao (id, id_viagem, id_motorista, dt_hr_evento, id_tipo_infr
 (7, 7, 7, '2023-07-01 11:00:00', 8, -8.047562, -34.877000, 40.0),
 (8, 8, 8, '2023-08-08 08:30:00', 9, -12.977749, -38.501630, 55.0),
 (9, 9, 9, '2023-09-22 10:20:00', 10, -16.686882, -49.264788, 50.0),
-(10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0);
+(10, 10, 10, '2023-10-05 12:45:00', 3, -3.731862, -38.526669, 85.0),
+(11, 11, 1, '2025-10-04 09:15:00', 1, -23.550520, -46.633308, 98.2),
+(12, 11, 2, '2025-10-04 10:05:00', 6, -23.548900, -46.650000, 70.0),
+(13, 12, 3, '2025-10-05 08:55:00', 2, -22.909938, -47.062633, 72.5),
+(14, 12, 1, '2025-10-05 11:10:00', 1, -22.910500, -47.060000, 105.0),
+(15, 12, 4, '2025-10-05 12:40:00', 5, -22.912000, -47.058000, 0.0),
+(16, 12, 5, '2025-10-05 14:20:00', 9, -22.913500, -47.057000, NULL),
+(17, 13, 6, '2025-10-06 07:30:00', 3, -22.906847, -43.172896, 88.7),
+(18, 13, 7, '2025-10-06 09:45:00', 2, -22.905000, -43.170000, 66.0),
+(19, 13, 8, '2025-10-06 13:20:00', 8, -22.904000, -43.168000, NULL),
+(20, 14, 9, '2025-10-07 10:05:00', 4, -25.428356, -49.273251, 40.0),
+(21, 14, 3, '2025-10-07 11:30:00', 1, -25.427000, -49.270000, 112.3),
+(22, 14, 2, '2025-10-07 14:50:00', 6, -25.426000, -49.275000, NULL),
+(23, 14, 1, '2025-10-07 16:10:00', 7, -25.425000, -49.276000, NULL),
+(24, 15, 4, '2025-10-08 06:20:00', 1, -19.916681, -43.934493, 95.0),
+(25, 15, 5, '2025-10-08 09:40:00', 10, -19.918000, -43.933000, NULL),
+(26, 15, 3, '2025-10-08 11:55:00', 2, -19.919000, -43.932000, 70.2),
+(27, 11, 6, '2025-10-09 08:15:00', 3, -30.034647, -51.217658, 82.5),
+(28, 12, 7, '2025-10-09 13:30:00', 9, -30.035000, -51.218000, NULL),
+(29, 16, 8, '2025-10-10 15:45:00', 1, -3.731862, -38.526669, 88.0),
+(30, 16, 9, '2025-10-11 10:20:00', 2, -12.977749, -38.501630, 60.3);
 
 -- 14) MÍDIA DA OCORRÊNCIA
 INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VALUES
@@ -444,23 +471,22 @@ CREATE VIEW vw_relatorio_simples_viagem (
     id_viagem,
     placa_caminhao,
     data_inicio_viagem,
-    nome_motorista,
     km_viagem,
+	is_analisada,
     pontuacao_total
 ) AS
 SELECT
     v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
-    m.nome_completo AS nome_motorista,
     v.km_viagem     AS km_viagem,
+	v.was_analyzed  AS is_analisada,
     SUM(ti.pontuacao) AS pontuacao_total
 FROM tb_infracao o
 JOIN tb_viagem v    ON o.id_viagem = v.id
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
-JOIN tb_motorista m ON m.id = o.id_motorista
 JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
-GROUP BY c.placa, v.dt_hr_inicio, m.id, o.id, v.id, c.id;
+GROUP BY c.placa, v.dt_hr_inicio, v.id, c.id, v.id;
 
 CREATE VIEW vw_visao_basica_viagem (
     id_viagem,
@@ -537,13 +563,21 @@ CREATE VIEW vw_relatorio_semanal_infracoes(
     dia_semana,
     total_infracoes
 ) AS 
-SELECT 
-    TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
+SELECT
+    CASE EXTRACT(DOW FROM dt_hr_evento)
+        WHEN 0 THEN 'Domingo'
+        WHEN 1 THEN 'Segunda'
+        WHEN 2 THEN 'Terça'
+        WHEN 3 THEN 'Quarta'
+        WHEN 4 THEN 'Quinta'
+        WHEN 5 THEN 'Sexta'
+        WHEN 6 THEN 'Sábado'
+    END AS dia_semana,
     COUNT(*) AS total_infracoes
-FROM tb_infracao i
-WHERE dt_hr_evento >= CURRENT_DATE - interval '1 week'
-GROUP BY TO_CHAR(dt_hr_evento, 'FMDay')
-ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
+FROM tb_infracao
+WHERE dt_hr_evento >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY EXTRACT(DOW FROM dt_hr_evento)
+ORDER BY EXTRACT(DOW FROM dt_hr_evento);
 
 -- =============================
 -- PROCS
