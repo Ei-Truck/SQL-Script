@@ -325,7 +325,7 @@ INSERT INTO tb_cargo (id, nome) VALUES
 
 -- 7) USUARIO
 INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
-(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', 'hash1', 3),
+(1, '123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
 (2, '987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', 'hash2', 4),
 (3, '321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', 'hash3', 2),
 (4, '111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', 'hash4', 3),
