@@ -28,6 +28,11 @@ drop view if exists vw_visao_basica_viagem;
 drop view if exists vw_ocorrencia_por_viagem;
 drop view if exists vw_motorista_pontuacao_mensal;
 drop view if exists vw_relatorio_semanal_infracoes;
+drop view if exists vw_total_ocorrencias;
+drop view if exists vw_ocorrencias_por_gravidade
+drop view if exists vw_motorista_quantidade_infracoes
+drop view if exists vw_variacao_mes_passado
+drop view if exists vw_ocorrencias_por_tipo
 drop procedure if exists prc_registrar_login_usuario;
 drop function if exists fn_atualizar_dau;
 drop trigger if exists trg_atualizar_dau on lg_login_usuario;
@@ -471,12 +476,21 @@ INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
 -- =============================
 -- VIEWS
 -- =============================
-CREATE VIEW vw_relatorio_simples_viagem AS
+CREATE VIEW vw_relatorio_simples_viagem (
+    id_viagem,
+    placa_caminhao,
+    data_inicio_viagem,
+    nome_motorista,
+    was_analyzed,
+    km_viagem,
+    pontuacao_total
+) AS
 SELECT
     v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     m.nome_completo AS nome_motorista,
+    v.was_analyzed  AS was_analyzed,
     v.km_viagem     AS km_viagem,
     v.was_analyzed  AS is_analisada,
     SUM(ti.pontuacao) AS pontuacao_total
@@ -571,6 +585,68 @@ FROM tb_infracao i
 WHERE dt_hr_evento >= CURRENT_DATE - interval '1 week'
 GROUP BY TO_CHAR(dt_hr_evento, 'FMDay')
 ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
+
+
+CREATE VIEW vw_total_ocorrencias (
+    total_ocorrencias
+) AS
+SELECT
+    COUNT(o.id) AS total_ocorrencias
+FROM tb_infracao o;
+
+CREATE VIEW vw_ocorrencias_por_gravidade (
+    total_ocorrencias,
+    gravidade
+) AS
+SELECT
+    COUNT(o.id) AS total_ocorrencias,
+    tg.nome AS gravidade
+FROM tb_infracao o
+JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
+JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
+GROUP BY tg.nome;
+
+
+CREATE VIEW vw_motorista_quantidade_infracoes (
+    motorista,
+    quantidade_infracoes
+) AS
+SELECT
+    m.nome_completo as motorista,
+    count(ti.id) as quantidade_infracoes
+FROM tb_motorista m
+JOIN tb_infracao ti on m.id = ti.id_motorista
+group by m.nome_completo
+order by quantidade_infracoes;
+
+
+CREATE OR REPLACE VIEW vw_variacao_mes_passado AS
+WITH totais AS (
+    SELECT
+        COUNT(*) FILTER (WHERE dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month') AS mes_passado,
+        COUNT(*) FILTER (WHERE EXTRACT(MONTH FROM dt_hr_evento) >= EXTRACT(MONTH FROM CURRENT_DATE)) AS mes_atual
+    FROM tb_infracao
+)
+SELECT
+    mes_passado,
+    mes_atual,
+    ((mes_atual - mes_passado)::numeric / NULLIF(mes_passado, 0)) * 100 AS variacao
+FROM totais;
+
+
+CREATE OR REPLACE VIEW vw_ocorrencias_por_tipo (
+    tipo_infracao,
+    total_ocorrencias,
+    porcentagem_do_total
+) AS
+SELECT
+    t.nome AS tipo_infracao,
+    COUNT(o.id) AS total_ocorrencias,
+    ROUND((COUNT(o.id)::numeric / SUM(COUNT(o.id)) OVER ()) * 100, 2) AS porcentagem_do_total
+FROM tb_infracao o
+JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
+GROUP BY t.nome;
+
 
 -- =============================
 -- PROCS
