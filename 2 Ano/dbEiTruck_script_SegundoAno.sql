@@ -29,10 +29,10 @@ drop view if exists vw_ocorrencia_por_viagem;
 drop view if exists vw_motorista_pontuacao_mensal;
 drop view if exists vw_relatorio_semanal_infracoes;
 drop view if exists vw_total_ocorrencias;
-drop view if exists vw_ocorrencias_por_gravidade
-drop view if exists vw_motorista_quantidade_infracoes
-drop view if exists vw_variacao_mes_passado
-drop view if exists vw_ocorrencias_por_tipo
+drop view if exists vw_ocorrencias_por_gravidade;
+drop view if exists vw_motorista_quantidade_infracoes;
+drop view if exists vw_variacao_mes_passado;
+drop view if exists vw_ocorrencias_por_tipo;
 drop procedure if exists prc_registrar_login_usuario;
 drop function if exists fn_atualizar_dau;
 drop trigger if exists trg_atualizar_dau on lg_login_usuario;
@@ -481,32 +481,34 @@ CREATE VIEW vw_relatorio_simples_viagem (
     placa_caminhao,
     data_inicio_viagem,
     nome_motorista,
-    was_analyzed,
     km_viagem,
-    pontuacao_total
+    pontuacao_total,
+    was_analyzed
 ) AS
 SELECT
     v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     m.nome_completo AS nome_motorista,
-    v.was_analyzed  AS was_analyzed,
     v.km_viagem     AS km_viagem,
-    v.was_analyzed  AS is_analisada,
-    SUM(ti.pontuacao) AS pontuacao_total
+    SUM(ti.pontuacao) AS pontuacao_total,
+    v.was_analyzed as was_analyzed
 FROM tb_infracao o
 JOIN tb_viagem v    ON o.id_viagem = v.id
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
 JOIN tb_motorista m ON m.id = o.id_motorista
 JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
-GROUP BY v.id, c.placa, v.dt_hr_inicio, m.nome_completo, v.km_viagem, v.was_analyzed;
+GROUP BY v.id, c.placa, v.dt_hr_inicio, m.nome_completo, v.km_viagem, v.was_analyzed
+order by v.id;
 
-CREATE OR REPLACE VIEW vw_visao_basica_viagem (
+
+CREATE VIEW vw_visao_basica_viagem (
     id_viagem,
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
     segmento,
+    unidade,
     nome_motorista,
     risco_motorista,
     url_midia_concatenada,
@@ -519,6 +521,7 @@ SELECT
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
     s.nome          AS segmento,
+    u.nome          AS unidade,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
     mc.url          AS url_midia_concatenada,
@@ -532,9 +535,10 @@ JOIN tb_tipo_infracao t ON t.id = o.id_tipo_infracao
 JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
 JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
 JOIN tb_unidade u ON u.id = m.id_unidade
-JOIN tb_segmento s ON s.id = u.id_segmento
+JOIN tb_segmento s ON s.id = m.id_unidade
 JOIN tb_caminhao c ON c.id = v.id_caminhao
-GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, m.nome_completo, tr.nome, tg.id, s.nome, mc.url, t.nome;
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, tr.nome, mc.url, tg.nome, t.nome, m.id_unidade
+ORDER BY v.id;
 
 
 CREATE VIEW vw_ocorrencia_por_viagem (
