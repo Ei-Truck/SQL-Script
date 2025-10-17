@@ -42,52 +42,52 @@ drop trigger if exists trg_atualizar_dau on lg_login_usuario;
 -- STATUS E TABELAS DE APOIO
 -- =============================
 CREATE TABLE tb_tipo_gravidade (
-    id         INTEGER PRIMARY KEY,
-    nome       VARCHAR(50) NOT NULL UNIQUE,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               INTEGER PRIMARY KEY,
+    nome             VARCHAR(50) NOT NULL UNIQUE,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_tipo_infracao (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(50) NOT NULL UNIQUE,
-    pontuacao  INTEGER NOT NULL,
+    id                SERIAL PRIMARY KEY,
+    nome              VARCHAR(50) NOT NULL UNIQUE,
+    pontuacao         INTEGER NOT NULL,
     id_tipo_gravidade INTEGER REFERENCES tb_tipo_gravidade,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    transaction_made  VARCHAR(20),
+    updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive       BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_localidade (
-    id         SERIAL PRIMARY KEY,
-    cep        VARCHAR(10),
-    numero_rua INTEGER,
-    uf_estado  VARCHAR(2),
-    nome       VARCHAR(80) NOT NULL UNIQUE,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    cep              VARCHAR(10),
+    numero_rua       INTEGER,
+    uf_estado        VARCHAR(2),
+    nome             VARCHAR(80) NOT NULL UNIQUE,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_tipo_risco (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(50) NOT NULL UNIQUE,
-    descricao  TEXT,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    nome             VARCHAR(50) NOT NULL UNIQUE,
+    descricao        TEXT,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
 -- SEGMENTO E UNIDADE
 -- =============================
 CREATE TABLE tb_segmento (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(40) NOT NULL UNIQUE,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    nome             VARCHAR(40) NOT NULL UNIQUE,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_unidade (
@@ -104,28 +104,28 @@ CREATE TABLE tb_unidade (
 -- USUÁRIOS
 -- =============================
 CREATE TABLE tb_cargo (
-    id         SERIAL PRIMARY KEY,
-    nome       VARCHAR(255) NOT NULL UNIQUE,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    nome             VARCHAR(255) NOT NULL UNIQUE,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_usuario (
-    id             SERIAL PRIMARY KEY,
-    cpf            VARCHAR(15) NOT NULL UNIQUE,
-    id_unidade     INTEGER REFERENCES tb_unidade,
-    id_perfil      INTEGER,
-    dt_contratacao DATE,
-    nome_completo  VARCHAR(150) NOT NULL,
-    telefone       VARCHAR(15) NOT NULL UNIQUE,
-    email          VARCHAR(150) NOT NULL UNIQUE,
-    hash_senha     VARCHAR(100) NOT NULL,
-    url_foto       VARCHAR(255) DEFAULT 'Sem foto',
-    id_cargo       INTEGER NOT NULL REFERENCES tb_cargo,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive     BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    cpf              VARCHAR(15) NOT NULL UNIQUE,
+    id_unidade       INTEGER REFERENCES tb_unidade,
+    id_perfil        INTEGER,
+    dt_contratacao   DATE,
+    nome_completo    VARCHAR(150) NOT NULL,
+    telefone         VARCHAR(15) NOT NULL UNIQUE,
+    email            VARCHAR(150) NOT NULL UNIQUE,
+    hash_senha       VARCHAR(100) NOT NULL,
+    url_foto         VARCHAR(255) DEFAULT 'Sem foto',
+    id_cargo         INTEGER NOT NULL REFERENCES tb_cargo,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -142,7 +142,7 @@ CREATE TABLE tb_caminhao (
     numero_frota     INTEGER NOT NULL,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive       BOOLEAN DEFAULT FALSE
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -160,7 +160,7 @@ CREATE TABLE tb_motorista (
     url_foto         VARCHAR(255) DEFAULT 'Sem foto',
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive       BOOLEAN DEFAULT FALSE
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -178,7 +178,7 @@ CREATE TABLE tb_viagem (
     was_analyzed     BOOLEAN DEFAULT FALSE,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive       BOOLEAN DEFAULT FALSE
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -209,7 +209,7 @@ CREATE TABLE tb_infracao (
     velocidade_kmh     NUMERIC(5, 2),
     transaction_made   VARCHAR(20),
     updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive         BOOLEAN DEFAULT FALSE
+    is_inactive        BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -237,7 +237,7 @@ CREATE TABLE tb_midia_concatenada (
     url              text NOT NULL,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive       BOOLEAN DEFAULT FALSE
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 -- =============================
@@ -411,7 +411,12 @@ INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro)
 (7, 7, 7, 'Falha de comunicação abordada em treinamento.', '2023-07-01 13:30:00'),
 (8, 8, 8, 'Carga violada reportada às autoridades competentes.', '2023-08-08 11:45:00'),
 (9, 9, 9, 'Parada não autorizada discutida com o motorista.', '2023-09-22 14:10:00'),
-(10, 10, 10,'Uso não autorizado do veículo investigado.', '2023-10-05 15:55:00');
+(10, 10, 10,'Uso não autorizado do veículo investigado.', '2023-10-05 15:55:00'),
+(11, 11, 1, 'Excesso de velocidade registrado, motorista advertido.', '2025-10-04 11:30:00'),
+(12, 12, 2, 'Desvio de rota identificado, orientações fornecidas.', '2025-10-05 12:45:00'),
+(13, 13, 3, 'Frenagem brusca analisada, sem medidas adicionais.', '2025-10-06 10:15:00'),
+(14, 14, 4, 'Colisão investigada, medidas corretivas implementadas.', '2025-10-07 13:20:00'),
+(15, 15, 5, 'Uso não autorizado do veículo investigado.', '2025-10-08 14:50:00');
 
 
 -- 13) OCORRENCIA
@@ -458,7 +463,12 @@ INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VA
 (7, 7, 7, 7, 'http://eitruck/video7.mp4'),
 (8, 8, 8, 8, 'http://eitruck/video8.mp4'),
 (9, 9, 9, 9, 'http://eitruck/video9.mp4'),
-(10, 10, 10, 10, 'http://eitruck/video10.mp4');
+(10, 10, 10, 10, 'http://eitruck/video10.mp4'),
+(11, 11, 11, 1, 'http://eitruck/video11.mp4'),
+(12, 12, 12, 2, 'http://eitruck/video12.mp4'),
+(13, 13, 13, 3, 'http://eitruck/video13.mp4'),
+(14, 14, 14, 4, 'http://eitruck/video14.mp4'),
+(15, 15, 15, 5, 'http://eitruck/video15.mp4');
 
 -- 15) MÍDIA CONCATENADA
 INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
@@ -471,7 +481,13 @@ INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
 (7, 7, 7, 'http://eitruck/concat_video7.mp4'),
 (8, 8, 8, 'http://eitruck/concat_video8.mp4'),
 (9, 9, 9, 'http://eitruck/concat_video9.mp4'),
-(10, 10, 10, 'http://eitruck/concat_video10.mp4');
+(10, 10, 10, 'http://eitruck/concat_video10.mp4'),
+(11, 11, 1, 'http://eitruck/concat_video11.mp4'),
+(12, 11, 2, 'http://eitruck/concat_video12.mp4'),
+(13, 12, 3, 'http://eitruck/concat_video13.mp4'),
+(14, 12, 1, 'http://eitruck/concat_video14.mp4'),
+(15, 12, 4, 'http://eitruck/concat_video15.mp4'),
+(16, 12, 5, 'http://eitruck/concat_video16.mp4');
 
 -- =============================
 -- VIEWS
@@ -480,25 +496,23 @@ CREATE VIEW vw_relatorio_simples_viagem (
     id_viagem,
     placa_caminhao,
     data_inicio_viagem,
-    nome_motorista,
     km_viagem,
     pontuacao_total,
     was_analyzed
 ) AS
 SELECT
-    v.id            AS id_viagem,
-    c.placa         AS placa_caminhao,
-    v.dt_hr_inicio  AS data_inicio_viagem,
-    m.nome_completo AS nome_motorista,
-    v.km_viagem     AS km_viagem,
+    v.id              AS id_viagem,
+    c.placa           AS placa_caminhao,
+    v.dt_hr_inicio    AS data_inicio_viagem,
+    v.km_viagem       AS km_viagem,
     SUM(ti.pontuacao) AS pontuacao_total,
-    v.was_analyzed as was_analyzed
-FROM tb_infracao o
-JOIN tb_viagem v    ON o.id_viagem = v.id
+    v.was_analyzed    AS was_analyzed
+FROM tb_viagem v
+JOIN tb_infracao o on v.id = o.id_viagem
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
 JOIN tb_motorista m ON m.id = o.id_motorista
 JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
-GROUP BY v.id, c.placa, v.dt_hr_inicio, m.nome_completo, v.km_viagem, v.was_analyzed
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.km_viagem, v.was_analyzed
 order by v.id;
 
 
@@ -507,6 +521,7 @@ CREATE VIEW vw_visao_basica_viagem (
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
+    km_viagem,
     segmento,
     unidade,
     nome_motorista,
@@ -520,6 +535,7 @@ SELECT
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
+    v.km_viagem     AS km_viagem,
     s.nome          AS segmento,
     u.nome          AS unidade,
     m.nome_completo AS nome_motorista,
@@ -528,15 +544,15 @@ SELECT
     tg.nome         AS tipo_gravidade,
     t.nome          AS tipo_infracao
 FROM tb_viagem v
-JOIN tb_infracao o ON o.id_viagem = v.id
-JOIN tb_motorista m ON m.id = o.id_motorista
-JOIN tb_tipo_risco tr ON m.id_tipo_risco = tr.id
-JOIN tb_tipo_infracao t ON t.id = o.id_tipo_infracao
-JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
+JOIN tb_infracao o           ON o.id_viagem = v.id
+JOIN tb_motorista m          ON m.id = o.id_motorista
+JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
+JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
+JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
 JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
-JOIN tb_unidade u ON u.id = m.id_unidade
-JOIN tb_segmento s ON s.id = m.id_unidade
-JOIN tb_caminhao c ON c.id = v.id_caminhao
+JOIN tb_unidade u            ON u.id = m.id_unidade
+JOIN tb_segmento s           ON s.id = m.id_unidade
+JOIN tb_caminhao c           ON c.id = v.id_caminhao
 GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, tr.nome, mc.url, tg.nome, t.nome, m.id_unidade
 ORDER BY v.id;
 
@@ -556,21 +572,25 @@ GROUP BY v.id, t.nome;
 CREATE VIEW vw_motorista_pontuacao_mensal(
     ranking_pontuacao,
     motorista,
+    id_unidade,
     unidade,
+    id_segmento,
     segmento,
     pontuacao_ultimo_mes
 ) AS
 SELECT
     DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
-    m.nome_completo AS motorista,
-    u.nome AS unidade,
-    s.nome AS segmento,
+    m.nome_completo   AS motorista,
+    u.id              AS id_unidade,
+    u.nome            AS unidade,
+    s.id              AS id_segmento,
+    s.nome            AS segmento,
     SUM(ti.pontuacao) AS pontuacao_ultimo_mes
 FROM tb_infracao i
-JOIN public.tb_motorista m ON i.id_motorista = m.id
+JOIN public.tb_motorista m      ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
-JOIN public.tb_unidade u ON m.id_unidade = u.id
-JOIN public.tb_segmento s ON u.id_segmento = s.id
+JOIN public.tb_unidade u        ON m.id_unidade = u.id
+JOIN public.tb_segmento s       ON u.id_segmento = s.id
 WHERE
     EXTRACT(MONTH FROM i.dt_hr_evento) >= EXTRACT(MONTH FROM current_date) - 1
     AND EXTRACT(YEAR FROM i.dt_hr_evento) = EXTRACT(YEAR FROM current_date)
@@ -581,8 +601,8 @@ ORDER BY rank_pontuacao;
 CREATE VIEW vw_relatorio_semanal_infracoes(
     dia_semana,
     total_infracoes
-) AS 
-SELECT 
+) AS
+SELECT
     TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
     COUNT(*) AS total_infracoes
 FROM tb_infracao i
@@ -592,64 +612,87 @@ ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
 
 
 CREATE VIEW vw_total_ocorrencias (
-    total_ocorrencias
-) AS
-SELECT
-    COUNT(o.id) AS total_ocorrencias
-FROM tb_infracao o;
-
-CREATE VIEW vw_ocorrencias_por_gravidade (
     total_ocorrencias,
-    gravidade
+    mes,
+    ano
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
-    tg.nome AS gravidade
+    extract(month from dt_hr_evento) mes,
+    extract(year from dt_hr_evento) ano
 FROM tb_infracao o
-JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
-JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
-GROUP BY tg.nome;
+group by mes, ano
+order by ano desc, mes desc;
+
+
+CREATE VIEW vw_ocorrencias_por_gravidade (
+    total_ocorrencias,
+    gravidade,
+    mes,
+    ano
+) AS
+SELECT
+    COUNT(o.id) AS total_ocorrencias,
+    tg.nome AS gravidade,
+    extract(month from dt_hr_evento) mes,
+    extract(year from dt_hr_evento) ano
+FROM tb_infracao o
+JOIN tb_tipo_infracao t     ON o.id_tipo_infracao = t.id
+JOIN tb_tipo_gravidade tg   ON t.id_tipo_gravidade = tg.id
+GROUP BY tg.nome, mes, ano;
 
 
 CREATE VIEW vw_motorista_quantidade_infracoes (
     motorista,
-    quantidade_infracoes
+    quantidade_infracoes,
+    mes,
+    ano
 ) AS
 SELECT
     m.nome_completo as motorista,
-    count(ti.id) as quantidade_infracoes
+    count(ti.id) as quantidade_infracoes,
+    extract(month from dt_hr_evento) mes,
+    extract(year from dt_hr_evento) ano
 FROM tb_motorista m
 JOIN tb_infracao ti on m.id = ti.id_motorista
-group by m.nome_completo
+group by m.nome_completo, mes, ano
 order by quantidade_infracoes;
 
 
-CREATE OR REPLACE VIEW vw_variacao_mes_passado AS
+CREATE VIEW vw_variacao_mes_passado_por_mes_ano AS
 WITH totais AS (
     SELECT
-        COUNT(*) FILTER (WHERE dt_hr_evento >= CURRENT_DATE - INTERVAL '1 month') AS mes_passado,
-        COUNT(*) FILTER (WHERE EXTRACT(MONTH FROM dt_hr_evento) >= EXTRACT(MONTH FROM CURRENT_DATE)) AS mes_atual
+        EXTRACT(MONTH FROM dt_hr_evento) AS mes,
+        EXTRACT(YEAR FROM dt_hr_evento) AS ano,
+        COUNT(*) AS total_infracoes
     FROM tb_infracao
-)
-SELECT
-    mes_passado,
-    mes_atual,
-    ((mes_atual - mes_passado)::numeric / NULLIF(mes_passado, 0)) * 100 AS variacao
-FROM totais;
+    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento)
+) SELECT
+    t1.mes,
+    t1.ano,
+    t1.total_infracoes AS infracoes_mes_atual,
+    t2.total_infracoes AS infracoes_mes_passado,
+    ((t1.total_infracoes - t2.total_infracoes)::numeric / NULLIF(t2.total_infracoes, 0)) * 100 AS variacao
+FROM totais t1
+LEFT JOIN totais t2 ON t1.mes = t2.mes + 1 AND t1.ano = t2.ano;
 
 
-CREATE OR REPLACE VIEW vw_ocorrencias_por_tipo (
+CREATE VIEW vw_ocorrencias_por_tipo (
     tipo_infracao,
     total_ocorrencias,
-    porcentagem_do_total
+    porcentagem_do_total,
+    mes,
+    ano
 ) AS
 SELECT
     t.nome AS tipo_infracao,
     COUNT(o.id) AS total_ocorrencias,
-    ROUND((COUNT(o.id)::numeric / SUM(COUNT(o.id)) OVER ()) * 100, 2) AS porcentagem_do_total
+    ROUND((COUNT(o.id)::decimal / SUM(COUNT(o.id)) OVER (PARTITION BY extract(month from dt_hr_evento), extract(year from dt_hr_evento))) * 100, 2) AS porcentagem_do_total,
+    extract(month from dt_hr_evento) mes,
+    extract(year from dt_hr_evento) ano
 FROM tb_infracao o
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
-GROUP BY t.nome;
+GROUP BY t.nome, mes, ano;
 
 
 -- =============================
