@@ -582,7 +582,6 @@ INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro)
 (13, 13, 3, 'Frenagem brusca analisada, sem medidas adicionais.', '2025-10-06 10:15:00'),
 (14, 14, 4, 'Colisão investigada, medidas corretivas implementadas.', '2025-10-07 13:20:00'),
 (15, 15, 5, 'Uso não autorizado do veículo investigado.', '2025-10-08 14:50:00'),
-INSERT INTO tb_registro (id, id_viagem, id_motorista, tratativa, dt_hr_registro) VALUES
 (16, 18, 11, 'Orientado sobre manutenção preventiva do veículo.', '2023-02-12 13:00:00'),
 (17, 19, 12, 'Frenagem brusca sem feridos; relatório enviado.', '2023-03-10 14:00:00'),
 (18, 20, 13, 'Checagem de carga realizada antes da saída.', '2023-04-22 19:00:00'),
