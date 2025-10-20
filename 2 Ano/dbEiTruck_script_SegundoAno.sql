@@ -754,7 +754,9 @@ INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VA
 (12, 12, 12, 2, 'http://eitruck/video12.mp4'),
 (13, 13, 13, 3, 'http://eitruck/video13.mp4'),
 (14, 14, 14, 4, 'http://eitruck/video14.mp4'),
-(15, 15, 15, 5, 'http://eitruck/video15.mp4'),
+(15, 15, 15, 5, 'http://eitruck/video15.mp4');
+
+INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url, is_concat) VALUES
 (16, 18, 31, 11, 'http://eitruck/video31.mp4', FALSE),
 (17, 18, 32, 11, 'http://eitruck/video32.mp4', FALSE),
 (18, 19, 33, 12, 'http://eitruck/video33.mp4', FALSE),
@@ -800,6 +802,7 @@ INSERT INTO tb_midia_infracao (id, id_viagem, id_infracao, id_motorista, url) VA
 (58, 56, 73, 19, 'http://eitruck/video73.mp4', FALSE),
 (59, 57, 74, 20, 'http://eitruck/video74.mp4', FALSE),
 (60, 18, 75, 11, 'http://eitruck/video75.mp4', TRUE);
+
 
 -- 15) MÍDIA CONCATENADA
 INSERT INTO tb_midia_concatenada (id, id_viagem, id_motorista, url) VALUES
