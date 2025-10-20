@@ -1046,6 +1046,41 @@ FROM tb_infracao o
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY t.nome, mes, ano;
 
+CREATE OR REPLACE VIEW vw_infracoes_motoristas_viagens (
+    id_motorista,
+    id_viagem,
+    nome_motorista,
+    url_midia_concatenada,
+    risco_motorista,
+    quantidade_infracao
+) AS
+WITH quantidade_infracoes_viagem_motorista AS (
+    SELECT
+        i.id_motorista,
+        i.id_viagem,
+        COUNT(i.id) AS quantidade_infracoes
+    FROM tb_infracao i
+    GROUP BY
+        i.id_motorista,
+        i.id_viagem
+)
+SELECT
+    q.id_motorista,
+    q.id_viagem,
+    m.nome_completo        AS nome_motorista,
+    mc.url                 AS url_midia_concatenada,
+    tr.nome                AS risco_motorista,
+    q.quantidade_infracoes AS quantidade_infracao
+FROM quantidade_infracoes_viagem_motorista q
+JOIN tb_motorista m
+    ON q.id_motorista = m.id
+JOIN tb_viagem v
+    ON q.id_viagem = v.id
+JOIN tb_midia_concatenada mc
+    ON v.id = mc.id_viagem
+JOIN tb_tipo_risco tr
+    ON m.id_tipo_risco = tr.id;
+
 
 -- =============================
 -- PROCS
