@@ -29,6 +29,13 @@ drop view if exists vw_ocorrencia_por_viagem;
 drop view if exists vw_motorista_pontuacao_mensal;
 drop view if exists vw_relatorio_semanal_infracoes;
 drop procedure if exists prc_registrar_login_usuario;
+drop procedure if exists prc_atualiza_administrador;
+drop procedure if exists prc_atualiza_analista;
+drop procedure if exists prc_atualiza_motorista;
+drop procedure if exists prc_atualiza_endereco;
+drop procedure if exists prc_atualiza_segmento;
+drop procedure if exists prc_atualiza_tipo_ocorrencia;
+drop procedure if exists prc_atualiza_unidade;
 drop function if exists fn_atualizar_dau;
 drop trigger if exists trg_atualizar_dau on lg_login_usuario;
 
@@ -37,7 +44,7 @@ drop trigger if exists trg_atualizar_dau on lg_login_usuario;
 -- STATUS E TABELAS DE APOIO
 -- =============================
 CREATE TABLE tb_tipo_gravidade (
-    id         INTEGER PRIMARY KEY,
+    id         SERIAL PRIMARY KEY,
     nome       VARCHAR(50) NOT NULL UNIQUE,
     transaction_made varchar(20),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -55,14 +62,17 @@ CREATE TABLE tb_tipo_infracao (
 );
 
 CREATE TABLE tb_localidade (
-    id         SERIAL PRIMARY KEY,
-    cep        VARCHAR(10),
-    numero_rua INTEGER,
-    uf_estado  VARCHAR(2),
-    nome       VARCHAR(80) NOT NULL UNIQUE,
-    transaction_made varchar(20),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_inactive BOOLEAN DEFAULT FALSE
+    id               SERIAL PRIMARY KEY,
+    cep              VARCHAR(10),
+    rua              TEXT,
+    numero           INTEGER,
+    bairro           TEXT,
+    estado           VARCHAR(2),
+    cidade           VARCHAR(80) NOT NULL,
+    pais             TEXT,
+    transaction_made VARCHAR(20),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_inactive      BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE tb_tipo_risco (
@@ -278,17 +288,17 @@ INSERT INTO tb_tipo_infracao (id, nome, pontuacao, id_tipo_gravidade) VALUES
 (10, 'Uso não autorizado', 7,5);
 
 -- 3) LOCALIDADE
-INSERT INTO tb_localidade (id, cep, numero_rua, uf_estado, nome) VALUES
-(1, '00000-000', 0, 'SP', 'São Paulo'),
-(2, '11111-111', 1, 'SP', 'Campinas'),
-(3, '22222-222', 2, 'RJ', 'Rio de Janeiro'),
-(4, '33333-333', 3, 'PR', 'Curitiba'),
-(5, '44444-444', 4, 'MG', 'Belo Horizonte'),
-(6, '55555-555', 5, 'RS', 'Porto Alegre'),
-(7, '66666-666', 6, 'PE', 'Recife'),
-(8, '77777-777', 7, 'BA', 'Salvador'),
-(9, '88888-888', 8, 'GO', 'Goiânia'),
-(10, '99999-999', 9, 'CE', 'Fortaleza');
+INSERT INTO tb_localidade (id, cep, rua, numero, bairro, estado, cidade, pais) VALUES
+(1, '01001-000', 'Avenida Paulista', 1000, 'Bela Vista', 'SP', 'São Paulo', 'Brasil'),
+(2, '13010-000', 'Rua XV de Novembro', 200, 'Centro', 'SP', 'Campinas', 'Brasil'),
+(3, '20010-000', 'Avenida Rio Branco', 300, 'Centro', 'RJ', 'Rio de Janeiro', 'Brasil'),
+(4, '80010-000', 'Rua das Flores', 400, 'Centro', 'PR', 'Curitiba', 'Brasil'),
+(5, '30110-000', 'Avenida Afonso Pena', 500, 'Centro', 'MG', 'Belo Horizonte', 'Brasil'),
+(6, '90010-000', 'Rua dos Andradas', 600, 'Centro Histórico', 'RS', 'Porto Alegre', 'Brasil'),
+(7, '50010-000', 'Avenida Boa Viagem', 700, 'Boa Viagem', 'PE', 'Recife', 'Brasil'),
+(8, '40010-000', 'Rua Chile', 800, 'Comércio', 'BA', 'Salvador', 'Brasil'),
+(9, '74010-000', 'Avenida Anhanguera', 900, 'Setor Central', 'GO', 'Goiânia', 'Brasil'),
+(10, '60010-000', 'Rua Monsenhor Tabosa', 1000, 'Centro', 'CE', 'Fortaleza', 'Brasil');
 
 -- 4) SEGMENTO
 INSERT INTO tb_segmento (id, nome) VALUES
@@ -318,9 +328,10 @@ INSERT INTO tb_unidade (id, id_segmento, nome, id_localidade) VALUES
 
 -- 6) CARGO
 INSERT INTO tb_cargo (id, nome) VALUES
-(1, 'Gerente de Análise'),
-(2, 'Analista Regional'),
-(3, 'Analista Local');
+(1, 'Administrador'),
+(2, 'Gerente de Análise'),
+(3, 'Analista Regional'),
+(4, 'Analista Local');
 
 -- 7) USUARIO
 INSERT INTO tb_usuario (id, cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
@@ -556,8 +567,8 @@ ORDER BY rank_pontuacao;
 CREATE VIEW vw_relatorio_semanal_infracoes(
     dia_semana,
     total_infracoes
-) AS 
-SELECT 
+) AS
+SELECT
     TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
     COUNT(*) AS total_infracoes
 FROM tb_infracao i
@@ -607,7 +618,7 @@ CREATE OR REPLACE PROCEDURE prc_atualiza_endereco()
 AS $$
 BEGIN
     UPDATE tb_localidade
-    SET cep = endereco_temp.cep, numero_rua = endereco_temp.numero, nome = endereco_temp.cidade, uf_estado = endereco_temp.estado, transaction_made = 'UPDATE', updated_at = CURRENT_DATE, is_inactive = FALSE
+    SET cep = endereco_temp.cep, numero = endereco_temp.numero, rua = endereco_temp.rua, cidade = endereco_temp.cidade, estado = endereco_temp.estado, bairro = endereco_temp.bairro, pais = endereco_temp.pais, transaction_made = 'UPDATE', updated_at = CURRENT_DATE, is_inactive = FALSE
     FROM endereco_temp
     WHERE tb_localidade.id = endereco_temp.id;
 
@@ -615,8 +626,8 @@ BEGIN
     SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
     WHERE NOT EXISTS( SELECT 1 FROM endereco_temp WHERE endereco_temp.id = tb_localidade.id );
 
-    INSERT INTO tb_localidade (cep, numero_rua, uf_estado, nome, transaction_made, updated_at, is_inactive)
-    SELECT endereco_temp.cep, endereco_temp.numero, endereco_temp.estado, endereco_temp.cidade,'INSERT', CURRENT_DATE, FALSE
+    INSERT INTO tb_localidade (cep, rua, numero, estado, cidade, bairro, pais, transaction_made, updated_at, is_inactive)
+    SELECT endereco_temp.cep, endereco_temp.rua, endereco_temp.numero, endereco_temp.estado, endereco_temp.cidade, endereco_temp.bairro, endereco_temp.pais, 'INSERT', CURRENT_DATE, FALSE
     FROM endereco_temp
     WHERE NOT EXISTS( SELECT 1 FROM tb_localidade WHERE endereco_temp.id = tb_localidade.id );
 END;
@@ -650,30 +661,31 @@ AS $$
 BEGIN
     UPDATE tb_tipo_infracao
     SET
-        pontuacao = tipo_infracao_temp.pontuacao,
-        nome = tipo_infracao_temp.tipo_evento,
-        id_tipo_gravidade = (select id from tb_tipo_gravidade where tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome),
+        pontuacao = tipo_ocorrencia_temp.pontuacao,
+        nome = tipo_ocorrencia_temp.tipo_evento,
+        id_tipo_gravidade = (select id from tb_tipo_gravidade where tipo_ocorrencia_temp.gravidade = tb_tipo_gravidade.nome),
         transaction_made = 'UPDATE',
         updated_at = CURRENT_DATE,
         is_inactive = FALSE
-    FROM tipo_infracao_temp
-    WHERE tb_tipo_infracao.id = tipo_infracao_temp.id;
+    FROM tipo_ocorrencia_temp
+    WHERE tb_tipo_infracao.id = tipo_ocorrencia_temp.id;
 
     UPDATE tb_tipo_infracao
     SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
-    WHERE NOT EXISTS( SELECT 1 FROM tipo_infracao_temp WHERE tipo_infracao_temp.id = tb_tipo_infracao.id );
+    WHERE NOT EXISTS( SELECT 1 FROM tipo_ocorrencia_temp WHERE tipo_ocorrencia_temp.id = tb_tipo_infracao.id );
 
     INSERT INTO tb_tipo_gravidade (nome, transaction_made, updated_at, is_inactive)
-    SELECT tipo_infracao_temp.gravidade, 'INSERT', CURRENT_DATE, FALSE
-    FROM tipo_infracao_temp
-    WHERE NOT EXISTS( SELECT nome FROM tb_tipo_gravidade WHERE tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome );
+    SELECT DISTINCT tipo_ocorrencia_temp.gravidade, 'INSERT', CURRENT_DATE, FALSE
+    FROM tipo_ocorrencia_temp
+    WHERE tipo_ocorrencia_temp.gravidade IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM tb_tipo_gravidade WHERE tb_tipo_gravidade.nome = tipo_ocorrencia_temp.gravidade);
 
     INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade, transaction_made, updated_at, is_inactive)
-    SELECT tipo_infracao_temp.tipo_evento, tipo_infracao_temp.pontuacao, tb_tipo_gravidade.id, 'INSERT', CURRENT_DATE, FALSE
-    FROM tipo_infracao_temp
-    JOIN tb_tipo_gravidade on tipo_infracao_temp.gravidade = tb_tipo_gravidade.nome
+    SELECT tipo_ocorrencia_temp.tipo_evento, tipo_ocorrencia_temp.pontuacao, tb_tipo_gravidade.id, 'INSERT', CURRENT_DATE, FALSE
+    FROM tipo_ocorrencia_temp
+    JOIN tb_tipo_gravidade on tipo_ocorrencia_temp.gravidade = tb_tipo_gravidade.nome
 
-    WHERE NOT EXISTS( SELECT 1 FROM tb_tipo_infracao WHERE tipo_infracao_temp.id = tb_tipo_infracao.id );
+    WHERE NOT EXISTS( SELECT 1 FROM tb_tipo_infracao WHERE tipo_ocorrencia_temp.id = tb_tipo_infracao.id );
 END;
 $$;
 
@@ -684,35 +696,39 @@ AS $$
 BEGIN
     UPDATE tb_usuario
     SET
-        cpf = analista_temp.cpf,
-        id_unidade = analista_temp.id_unidade,
-        dt_contratacao = analista_temp.dt_contratacao,
-        nome_completo = analista_temp.nome_completo,
-        telefone = analista_temp.telefone,
-        email = analista_temp.email,
-        hash_senha = analista_temp.senha,
-        id_cargo = (select id from tb_cargo where analista_temp.cargo = tb_cargo.nome),
+        cpf = a.cpf,
+        id_unidade = a.id_unidade,
+        dt_contratacao = a.dt_contratacao,
+        nome_completo = a.nome_completo,
+        telefone = a.telefone,
+        email = a.email,
+        hash_senha = a.senha,
+        id_cargo = (SELECT c.id FROM tb_cargo c WHERE c.nome = a.cargo),
         transaction_made = 'UPDATE',
         updated_at = CURRENT_DATE,
         is_inactive = FALSE
-    FROM analista_temp
-    WHERE tb_usuario.id = analista_temp.id;
+    FROM analista_temp a
+    WHERE tb_usuario.id = a.id
+      AND tb_usuario.id_cargo <> 1;
 
     UPDATE tb_usuario
-    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
-    WHERE NOT EXISTS( SELECT 1 FROM analista_temp WHERE analista_temp.id = tb_usuario.id );
+    SET transaction_made = 'DELETE',
+        updated_at = CURRENT_DATE,
+        is_inactive = TRUE
+    WHERE tb_usuario.id_cargo <> 1
+      AND NOT EXISTS (SELECT 1 FROM analista_temp a WHERE a.id = tb_usuario.id);
 
     INSERT INTO tb_cargo (nome, transaction_made, updated_at, is_inactive)
-    SELECT analista_temp.cargo, 'INSERT', CURRENT_DATE, FALSE
-    FROM analista_temp
-    WHERE NOT EXISTS( SELECT nome FROM tb_cargo WHERE analista_temp.cargo = tb_cargo.nome );
+    SELECT DISTINCT a.cargo, 'INSERT', CURRENT_DATE, FALSE
+    FROM analista_temp a
+    WHERE NOT EXISTS (SELECT 1 FROM tb_cargo c WHERE c.nome = a.cargo);
 
     INSERT INTO tb_usuario (cpf, id_unidade, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, transaction_made, updated_at, is_inactive)
-    SELECT analista_temp.cpf, analista_temp.id_unidade, analista_temp.dt_contratacao, analista_temp.nome, analista_temp.telefone, analista_temp.email, analista_temp.senha, tb_cargo.id, 'INSERT', CURRENT_DATE, FALSE
-    FROM analista_temp
-    JOIN tb_cargo on analista_temp.cargo = tb_cargo.nome
-    WHERE NOT EXISTS( SELECT 1 FROM tb_usuario WHERE analista_temp.id = tb_usuario.id );
-
+    SELECT a.cpf, a.id_unidade, a.dt_contratacao, a.nome_completo, a.telefone, a.email, a.senha, c.id, 'INSERT', CURRENT_DATE, FALSE
+    FROM analista_temp a
+    JOIN tb_cargo c ON a.cargo = c.nome
+    LEFT JOIN tb_usuario u ON u.cpf = a.cpf
+    WHERE u.cpf IS NULL;
 END;
 $$;
 
@@ -723,26 +739,31 @@ AS $$
 BEGIN
     UPDATE tb_usuario
     SET
-        cpf = administrador_temp.cpf,
-        nome_completo = administrador_temp.nome_completo,
-        telefone = administrador_temp.telefone,
-        email = administrador_temp.email,
-        hash_senha = administrador_temp.senha,
+        cpf = ad.cpf,
+        nome_completo = ad.nome_completo,
+        telefone = ad.telefone,
+        email = ad.email,
+        hash_senha = ad.senha,
         id_cargo = 1,
         transaction_made = 'UPDATE',
         updated_at = CURRENT_DATE,
         is_inactive = FALSE
-    FROM administrador_temp
-    WHERE tb_usuario.id = administrador_temp.id;
+    FROM administrador_temp ad
+    WHERE tb_usuario.id = ad.id
+      AND tb_usuario.id_cargo = 1;
 
     UPDATE tb_usuario
-    SET transaction_made = 'DELETE', updated_at = CURRENT_DATE, is_inactive = TRUE
-    WHERE NOT EXISTS( SELECT 1 FROM administrador_temp WHERE administrador_temp.id = tb_usuario.id );
+    SET transaction_made = 'DELETE',
+        updated_at = CURRENT_DATE,
+        is_inactive = TRUE
+    WHERE tb_usuario.id_cargo = 1
+      AND NOT EXISTS (SELECT 1 FROM administrador_temp ad WHERE ad.id = tb_usuario.id);
 
     INSERT INTO tb_usuario (cpf, nome_completo, telefone, email, hash_senha, id_cargo, transaction_made, updated_at, is_inactive)
-    SELECT administrador_temp.cpf, administrador_temp.nome_completo, administrador_temp.telefone ,administrador_temp.email, administrador_temp.senha, 1, 'INSERT', CURRENT_DATE, FALSE
-    FROM administrador_temp
-    WHERE NOT EXISTS( SELECT 1 FROM tb_usuario WHERE administrador_temp.id = tb_usuario.id );
+    SELECT ad.cpf, ad.nome_completo, ad.telefone, ad.email, ad.senha, 1, 'INSERT', CURRENT_DATE, FALSE
+    FROM administrador_temp ad
+    LEFT JOIN tb_usuario u ON u.cpf = ad.cpf
+    WHERE u.cpf IS NULL;
 END;
 $$;
 
