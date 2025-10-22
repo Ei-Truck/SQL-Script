@@ -849,6 +849,9 @@ CREATE VIEW vw_relatorio_simples_viagem (
     placa_caminhao,
     data_inicio_viagem,
     km_viagem,
+    id_segmento,
+    id_unidade,
+    id_localidade,
     pontuacao_total,
     was_analyzed
 ) AS
@@ -857,14 +860,20 @@ SELECT
     c.placa           AS placa_caminhao,
     v.dt_hr_inicio    AS data_inicio_viagem,
     v.km_viagem       AS km_viagem,
+    s.id              AS id_segmento,
+    u.id              AS id_unidade,
+    l.id  AS id_localidade,
     SUM(ti.pontuacao) AS pontuacao_total,
     v.was_analyzed    AS was_analyzed
 FROM tb_viagem v
 JOIN tb_infracao o on v.id = o.id_viagem
 JOIN tb_caminhao c  ON v.id_caminhao = c.id
 JOIN tb_motorista m ON m.id = o.id_motorista
+JOIN tb_segmento s ON s.id = c.id_segmento
+JOIN tb_unidade u ON u.id = m.id_unidade
+JOIN tb_localidade l ON u.id_localidade = l.id
 JOIN tb_tipo_infracao ti ON o.id_tipo_infracao = ti.id
-GROUP BY v.id, c.placa, v.dt_hr_inicio, v.km_viagem, v.was_analyzed
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.km_viagem, v.was_analyzed, s.id, u.id, l.id
 order by v.id;
 
 
@@ -874,8 +883,11 @@ CREATE VIEW vw_visao_basica_viagem (
     data_inicio_viagem,
     data_fim_viagem,
     km_viagem,
+    id_segmento,
     segmento,
+    id_unidade,
     unidade,
+    id_localidade,
     nome_motorista,
     risco_motorista,
     url_midia_concatenada,
@@ -888,15 +900,18 @@ SELECT
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
     v.km_viagem     AS km_viagem,
+    s.id            AS id_segmento,
     s.nome          AS segmento,
+    u.id            AS id_unidade,
     u.nome          AS unidade,
+    l.id            AS id_localidade,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
     mc.url          AS url_midia_concatenada,
     tg.nome         AS tipo_gravidade,
     t.nome          AS tipo_infracao
 FROM tb_viagem v
-JOIN tb_infracao o           ON o.id_viagem = v.id
+JOIN tb_infracao o            ON o.id_viagem = v.id
 JOIN tb_motorista m          ON m.id = o.id_motorista
 JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
 JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
@@ -905,7 +920,8 @@ JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
 JOIN tb_unidade u            ON u.id = m.id_unidade
 JOIN tb_segmento s           ON s.id = m.id_unidade
 JOIN tb_caminhao c           ON c.id = v.id_caminhao
-GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, tr.nome, mc.url, tg.nome, t.nome, m.id_unidade
+JOIN tb_localidade l on u.id_localidade = l.id
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, tr.nome, mc.url, tg.nome, t.nome, m.id_unidade, s.id, u.id, l.id
 ORDER BY v.id;
 
 
@@ -952,28 +968,43 @@ ORDER BY rank_pontuacao;
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
     dia_semana,
-    total_infracoes
+    total_infracoes,
+    id_unidade,
+    id_localidade,
+    id_segmento
 ) AS
 SELECT
     TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
-    COUNT(*) AS total_infracoes
+    COUNT(*) AS total_infracoes,
+    m.id_unidade,
+    u.id_localidade,
+    u.id_segmento
 FROM tb_infracao i
+JOIN tb_motorista m ON i.id_motorista = m.id
+JOIN tb_unidade u ON i.transaction_made = u.transaction_made
+JOIN tb_segmento ts ON u.id_segmento = ts.id
 WHERE dt_hr_evento >= CURRENT_DATE - interval '1 week'
-GROUP BY TO_CHAR(dt_hr_evento, 'FMDay')
+GROUP BY TO_CHAR(dt_hr_evento, 'FMDay'), m.id_unidade, u.id_localidade, u.id_segmento
 ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
 
 
 CREATE VIEW vw_total_ocorrencias (
     total_ocorrencias,
     mes,
-    ano
+    ano,
+    id_unidade,
+    id_localidade
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
     extract(month from dt_hr_evento) mes,
-    extract(year from dt_hr_evento) ano
+    extract(year from dt_hr_evento) ano,
+    m.id_unidade,
+    u.id_localidade
 FROM tb_infracao o
-group by mes, ano
+JOIN tb_motorista m ON o.id_motorista = m.id
+JOIN tb_unidade u ON m.id_unidade = u.id
+group by mes, ano, m.id_unidade, u.id_localidade
 order by ano desc, mes desc;
 
 
@@ -981,33 +1012,44 @@ CREATE VIEW vw_ocorrencias_por_gravidade (
     total_ocorrencias,
     gravidade,
     mes,
-    ano
+    ano,
+    id_unidade,
+    id_localidade
 ) AS
 SELECT
     COUNT(o.id) AS total_ocorrencias,
     tg.nome AS gravidade,
     extract(month from dt_hr_evento) mes,
-    extract(year from dt_hr_evento) ano
+    extract(year from dt_hr_evento) ano,
+    m.id_unidade,
+    u.id_localidade
 FROM tb_infracao o
 JOIN tb_tipo_infracao t     ON o.id_tipo_infracao = t.id
 JOIN tb_tipo_gravidade tg   ON t.id_tipo_gravidade = tg.id
-GROUP BY tg.nome, mes, ano;
+JOIN tb_motorista m on o.id_motorista = m.id
+JOIN tb_unidade u on m.id_unidade = u.id
+GROUP BY tg.nome, mes, ano, m.id_unidade, u.id_localidade;
 
 
 CREATE VIEW vw_motorista_quantidade_infracoes (
     motorista,
     quantidade_infracoes,
     mes,
-    ano
+    ano,
+    id_unidade,
+    id_localidade
 ) AS
 SELECT
     m.nome_completo as motorista,
-    count(ti.id) as quantidade_infracoes,
+    count(i.id) as quantidade_infracoes,
     extract(month from dt_hr_evento) mes,
-    extract(year from dt_hr_evento) ano
+    extract(year from dt_hr_evento) ano,
+    m.id_unidade,
+    u.id_localidade
 FROM tb_motorista m
-JOIN tb_infracao ti on m.id = ti.id_motorista
-group by m.nome_completo, mes, ano
+JOIN tb_infracao i on m.id = i.id_motorista
+JOIN tb_unidade u on m.id_unidade = u.id
+group by m.nome_completo, mes, ano, m.id_unidade, u.id_localidade
 order by quantidade_infracoes;
 
 
