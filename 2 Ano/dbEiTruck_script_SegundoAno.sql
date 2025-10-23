@@ -963,16 +963,19 @@ SELECT
     u.nome            AS unidade,
     s.id              AS id_segmento,
     s.nome            AS segmento,
-    SUM(ti.pontuacao) AS pontuacao_ultimo_mes
+    SUM(ti.pontuacao) AS pontuacao_ultimo_mes,
+    u.id_localidade   AS id_localidade,
+    l.estado          AS localidade_estado
 FROM tb_infracao i
 JOIN public.tb_motorista m      ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
 JOIN public.tb_unidade u        ON m.id_unidade = u.id
 JOIN public.tb_segmento s       ON u.id_segmento = s.id
+JOIN public.tb_localidade l     ON u.id_localidade = l.id
 WHERE
     EXTRACT(MONTH FROM i.dt_hr_evento) >= EXTRACT(MONTH FROM current_date) - 1
     AND EXTRACT(YEAR FROM i.dt_hr_evento) = EXTRACT(YEAR FROM current_date)
-GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome
+GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome, u.id_localidade, l.estado
 ORDER BY rank_pontuacao;
 
 
