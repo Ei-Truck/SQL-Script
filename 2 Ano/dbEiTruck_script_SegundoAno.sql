@@ -33,6 +33,7 @@ drop view if exists vw_ocorrencias_por_gravidade;
 drop view if exists vw_motorista_quantidade_infracoes;
 drop view if exists vw_variacao_mes_passado;
 drop view if exists vw_ocorrencias_por_tipo;
+drop view if exists vw_quantidade_infracao_tipo_gravidade;
 drop procedure if exists prc_registrar_login_usuario;
 drop procedure if exists prc_atualiza_administrador;
 drop procedure if exists prc_atualiza_analista;
@@ -276,10 +277,7 @@ INSERT INTO tb_tipo_gravidade(nome) VALUES
 ('Leve'),
 ('Média'),
 ('Grave'),
-('Gravíssima'),
-('Crítica'),
-('Observacional'),
-('Informativo');
+('Gravíssima');
 
 -- 2) TIPO_OCORRENCIA
 INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
@@ -287,12 +285,12 @@ INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
 ('Frenagem brusca', 3,2),
 ('Aceleração brusca', 3,3),
 ('Colisão', 10,4),
-('Pane mecânica', 6,5),
+('Pane mecânica', 6,4),
 ('Desvio de rota', 4,1),
 ('Falha de comunicação', 2,2),
 ('Carga violada', 8,3),
 ('Parada não autorizada', 4,4),
-('Uso não autorizado', 7,5),
+('Uso não autorizado', 7,4),
 ('Uso de celular ao volante', 6, 3),
 ('Ultrapassagem indevida', 7, 4),
 ('Não uso de EPI (carga)', 4, 2),
@@ -301,8 +299,8 @@ INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
 ('Ignorar sinalização', 6, 3),
 ('Rodagem em faixa interditada', 5, 1),
 ('Velocidade incompatível com pista', 6, 3),
-('Falha no sistema de freio', 9, 5),
-('Atitude agressiva/roubo de carga', 10, 5);
+('Falha no sistema de freio', 9, 4),
+('Atitude agressiva/roubo de carga', 10, 4);
 
 -- 3) LOCALIDADE
 INSERT INTO tb_localidade (cep, rua, numero, bairro, estado, cidade, pais) VALUES
@@ -1136,6 +1134,28 @@ JOIN tb_midia_concatenada mc
 JOIN tb_tipo_risco tr
     ON m.id_tipo_risco = tr.id;
 
+
+CREATE OR REPLACE VIEW vw_quantidade_infracao_tipo_gravidade (
+    id_viagem,
+    id_motorista,
+    tipo_leve,
+    tipo_media,
+    tipo_grave,
+    tipo_gravissima
+) AS
+SELECT
+    v.id AS id_viagem,
+    m.id AS id_motorista,
+    SUM(CASE WHEN tg.nome = 'Leve' THEN 1 ELSE 0 END) AS tipo_leve,
+    SUM(CASE WHEN tg.nome = 'Média' THEN 1 ELSE 0 END) AS tipo_media,
+    SUM(CASE WHEN tg.nome = 'Grave' THEN 1 ELSE 0 END) AS tipo_grave,
+    SUM(CASE WHEN tg.nome = 'Gravíssima' THEN 1 ELSE 0 END) AS tipo_gravissima
+FROM tb_infracao i
+JOIN tb_viagem v ON i.id_viagem = v.id
+JOIN tb_motorista m ON i.id_motorista = m.id
+JOIN tb_tipo_infracao t ON i.id_tipo_infracao = t.id
+JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
+GROUP BY v.id, m.id;
 
 -- =============================
 -- PROCS
