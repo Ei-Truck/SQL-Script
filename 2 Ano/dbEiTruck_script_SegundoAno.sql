@@ -378,45 +378,42 @@ INSERT INTO tb_cargo (nome) VALUES
 ('Gerente de Análise'),
 ('Analista Regional'),
 ('Analista Local'),
-('Supervisor de Frota'),
-('Coordenador de Segurança'),
-('Tecnico de Manutenção'),
-('Operador de Rastreamento');
+('Analista Segmento');
 
 -- 7) USUARIO principal de QA
 INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, url_foto) VALUES
-('123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/1/profile_1.jpg');
+('123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 1, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/1/profile_1.jpg');
 
 -- 7.1) USUARIOS FAKE
 INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
-('987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
 ('321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
-('444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
-('222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
-('555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
-('888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
+('111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
+('444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
 ('101.202.303-44', 11, 1, '2020-03-01', 'Lúcia Fernandes', '+5514999990001', 'lucia.fernandes@empresa.com', '$2a$12$hashfake1', 5),
-('202.303.404-55', 12, 1, '2019-07-15', 'Hugo Ribeiro', '+5512999990002', 'hugo.ribeiro@empresa.com', '$2a$12$hashfake2', 6),
-('303.404.505-66', 13, 2, '2021-11-21', 'Marina Sales', '+5531999990003', 'marina.sales@empresa.com', '$2a$12$hashfake3', 7),
+('202.303.404-55', 12, 1, '2019-07-15', 'Hugo Ribeiro', '+5512999990002', 'hugo.ribeiro@empresa.com', '$2a$12$hashfake2', 5),
+('303.404.505-66', 13, 2, '2021-11-21', 'Marina Sales', '+5531999990003', 'marina.sales@empresa.com', '$2a$12$hashfake3', 5),
 ('404.505.606-77', 14, 2, '2018-02-10', 'Anderson Lima', '+5571999990004', 'anderson.lima@empresa.com', '$2a$12$hashfake4', 5),
-('505.606.707-88', 15, 3, '2022-08-05', 'Camila Rocha', '+5541999990005', 'camila.rocha@empresa.com', '$2a$12$hashfake5', 6),
-('606.707.808-99', 16, 1, '2020-12-01', 'Diego Nunes', '+5571999990006', 'diego.nunes@empresa.com', '$2a$12$hashfake6', 7),
-('707.808.909-00', 17, 1, '2017-06-30', 'Patrícia Alves', '+5591999990007', 'patricia.alves@empresa.com', '$2a$12$hashfake7', 8),
-('808.909.010-11', 18, 2, '2016-09-18', 'Ronaldo Costa', '+5581999990008', 'ronaldo.costa@empresa.com', '$2a$12$hashfake8', 5),
-('909.010.111-22', 19, 3, '2015-01-04', 'Sofia Martins', '+559899990009',  'sofia.martins@empresa.com', '$2a$12$hashfake9', 6),
-('010.111.212-33', 20, 2, '2024-02-02', 'Igor Teixeira', '+5561999990010', 'igor.teixeira@empresa.com', '$2a$12$hashfake10', 7),
-('111.222.333-44', 11, 1, '2021-05-05', 'Natália Barros', '+5511999880011', 'natalia.barros@empresa.com', '$2a$12$hashfake11', 8),
-('222.333.444-55', 12, 1, '2019-10-10', 'Fábio Gomes', '+5513999880012', 'fabio.gomes@empresa.com', '$2a$12$hashfake12', 5),
-('333.444.555-66', 13, 2, '2018-12-12', 'Luan Pereira', '+5511999880013', 'luan.pereira@empresa.com', '$2a$12$hashfake13', 6),
-('444.555.666-77', 14, 2, '2022-03-03', 'Brenda Castro', '+5511999880014', 'brenda.castro@empresa.com', '$2a$12$hashfake14', 7),
-('555.666.777-88', 15, 1, '2020-06-06', 'Rita Moura', '+5511999880015', 'rita.moura@empresa.com', '$2a$12$hashfake15', 8),
+('505.606.707-88', 15, 3, '2022-08-05', 'Camila Rocha', '+5541999990005', 'camila.rocha@empresa.com', '$2a$12$hashfake5', 2),
+('606.707.808-99', 16, 1, '2020-12-01', 'Diego Nunes', '+5571999990006', 'diego.nunes@empresa.com', '$2a$12$hashfake6', 2),
+('707.808.909-00', 17, 1, '2017-06-30', 'Patrícia Alves', '+5591999990007', 'patricia.alves@empresa.com', '$2a$12$hashfake7', 2),
+('808.909.010-11', 18, 2, '2016-09-18', 'Ronaldo Costa', '+5581999990008', 'ronaldo.costa@empresa.com', '$2a$12$hashfake8', 3),
+('909.010.111-22', 19, 3, '2015-01-04', 'Sofia Martins', '+559899990009',  'sofia.martins@empresa.com', '$2a$12$hashfake9', 3),
+('010.111.212-33', 20, 2, '2024-02-02', 'Igor Teixeira', '+5561999990010', 'igor.teixeira@empresa.com', '$2a$12$hashfake10',3),
+('111.222.333-44', 11, 1, '2021-05-05', 'Natália Barros', '+5511999880011', 'natalia.barros@empresa.com', '$2a$12$hashfake11', 4),
+('222.333.444-55', 12, 1, '2019-10-10', 'Fábio Gomes', '+5513999880012', 'fabio.gomes@empresa.com', '$2a$12$hashfake12', 4),
+('333.444.555-66', 13, 2, '2018-12-12', 'Luan Pereira', '+5511999880013', 'luan.pereira@empresa.com', '$2a$12$hashfake13', 4),
+('444.555.666-77', 14, 2, '2022-03-03', 'Brenda Castro', '+5511999880014', 'brenda.castro@empresa.com', '$2a$12$hashfake14', 5),
+('555.666.777-88', 15, 1, '2020-06-06', 'Rita Moura', '+5511999880015', 'rita.moura@empresa.com', '$2a$12$hashfake15', 5),
 ('666.777.888-99', 16, 3, '2016-07-07', 'Eduarda Lima', '+5511999880016', 'eduarda.lima@empresa.com', '$2a$12$hashfake16', 5),
-('777.888.999-00', 17, 1, '2015-08-08', 'Mateus Cardoso', '+5511999880017', 'mateus.cardoso@empresa.com', '$2a$12$hashfake17', 6),
-('888.999.000-11', 18, 1, '2014-09-09', 'Helena Reis', '+5511999880018', 'helena.reis@empresa.com', '$2a$12$hashfake18', 7),
-('999.000.111-22', 19, 2, '2013-10-10', 'Thiago Pinto', '+5511999880019', 'thiago.pinto@empresa.com', '$2a$12$hashfake19', 8),
+('777.888.999-00', 17, 1, '2015-08-08', 'Mateus Cardoso', '+5511999880017', 'mateus.cardoso@empresa.com', '$2a$12$hashfake17', 2),
+('888.999.000-11', 18, 1, '2014-09-09', 'Helena Reis', '+5511999880018', 'helena.reis@empresa.com', '$2a$12$hashfake18', 3),
+('999.000.111-22', 19, 2, '2013-10-10', 'Thiago Pinto', '+5511999880019', 'thiago.pinto@empresa.com', '$2a$12$hashfake19', 4),
 ('000.111.222-33', 20, 3, '2023-11-11', 'Patricia Nascimento', '+5511999880020', 'patricia.nascimento@empresa.com', '$2a$12$hashfake20', 5);
 
 
