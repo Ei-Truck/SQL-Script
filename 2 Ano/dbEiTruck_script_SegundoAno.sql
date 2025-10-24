@@ -1374,4 +1374,95 @@ AFTER INSERT ON lg_login_usuario
 FOR EACH ROW
 EXECUTE FUNCTION fn_atualizar_dau();
 
+-- =============================
+-- ÍNDICES
+-- =============================
+
+
+-- Otimizam consultas que buscam tipos, gravidades ou unidades.
+-- Frequentemente usados em JOINs com tb_infracao e tb_viagem.
+CREATE INDEX idx_tipo_infracao_gravidade ON tb_tipo_infracao (id_tipo_gravidade);
+
+-- Acesso rápido a unidades por segmento (relatórios regionais, dashboards)
+CREATE INDEX idx_unidade_segmento        ON tb_unidade (id_segmento);
+-- Acesso rápido a unidades por localização (consultas geográficas ou filtros)
+CREATE INDEX idx_unidade_localidade      ON tb_unidade (id_localidade);
+
+-- Consultas de usuários por unidade e cargo (ex: “usuários de uma unidade”)
+CREATE INDEX idx_usuario_unidade         ON tb_usuario (id_unidade);
+CREATE INDEX idx_usuario_cargo           ON tb_usuario (id_cargo);
+
+-- Busca por e-mail e telefone em autenticação e gestão de contas
+CREATE INDEX idx_usuario_email           ON tb_usuario (email);
+CREATE INDEX idx_usuario_telefone        ON tb_usuario (telefone);
+
+-- JOINs entre caminhão, unidade e segmento — comuns em relatórios de frota
+CREATE INDEX idx_caminhao_segmento       ON tb_caminhao (id_segmento);
+CREATE INDEX idx_caminhao_unidade        ON tb_caminhao (id_unidade);
+
+-- Busca direta de caminhões por placa ou número de frota (consultas administrativas)
+CREATE INDEX idx_caminhao_placa          ON tb_caminhao (placa);
+CREATE INDEX idx_caminhao_num_frota      ON tb_caminhao (numero_frota);
+
+-- JOINs com unidade e tipo de risco em relatórios de desempenho
+CREATE INDEX idx_motorista_unidade       ON tb_motorista (id_unidade);
+CREATE INDEX idx_motorista_tipo_risco    ON tb_motorista (id_tipo_risco);
+
+-- Busca rápida de motorista por CPF (consultas e validações)
+CREATE INDEX idx_motorista_cpf           ON tb_motorista (cpf);
+
+-- Melhoram os JOINs mais comuns: viagem ↔ caminhão / usuário / localidade
+CREATE INDEX idx_viagem_caminhao         ON tb_viagem (id_caminhao);
+CREATE INDEX idx_viagem_usuario          ON tb_viagem (id_usuario);
+CREATE INDEX idx_viagem_origem           ON tb_viagem (id_origem);
+CREATE INDEX idx_viagem_destino          ON tb_viagem (id_destino);
+
+-- Filtros frequentes por datas de início/fim (relatórios, análises mensais)
+CREATE INDEX idx_viagem_dt_inicio        ON tb_viagem (dt_hr_inicio);
+CREATE INDEX idx_viagem_dt_fim           ON tb_viagem (dt_hr_fim);
+
+-- Flag de viagens já analisadas — usada em painéis e dashboards
+CREATE INDEX idx_viagem_was_analyzed     ON tb_viagem (was_analyzed);
+
+-- JOINs e relatórios de registros por viagem e motorista
+CREATE INDEX idx_registro_viagem         ON tb_registro (id_viagem);
+CREATE INDEX idx_registro_motorista      ON tb_registro (id_motorista);
+
+-- Filtros por data de registro (histórico de tratativas)
+CREATE INDEX idx_registro_dt             ON tb_registro (dt_hr_registro);
+
+-- JOINs com viagem, motorista e tipo de infração (consultas analíticas e dashboards)
+CREATE INDEX idx_infracao_viagem         ON tb_infracao (id_viagem);
+CREATE INDEX idx_infracao_motorista      ON tb_infracao (id_motorista);
+CREATE INDEX idx_infracao_tipo           ON tb_infracao (id_tipo_infracao);
+
+-- Consultas por data e localização (mapas de calor, gráficos temporais)
+CREATE INDEX idx_infracao_dt_evento      ON tb_infracao (dt_hr_evento);
+CREATE INDEX idx_infracao_coords         ON tb_infracao (latitude, longitude);
+
+-- JOINs frequentes nas views de relatórios de mídia
+CREATE INDEX idx_midia_infracao_viagem    ON tb_midia_infracao (id_viagem);
+CREATE INDEX idx_midia_infracao_motorista ON tb_midia_infracao (id_motorista);
+CREATE INDEX idx_midia_infracao_infracao  ON tb_midia_infracao (id_infracao);
+
+-- Consulta rápida das mídias concatenadas por viagem e motorista
+CREATE INDEX idx_midia_concat_viagem      ON tb_midia_concatenada (id_viagem);
+CREATE INDEX idx_midia_concat_motorista   ON tb_midia_concatenada (id_motorista);
+
+-- JOINs e contagens de logins por usuário (relatórios de acesso)
+CREATE INDEX idx_login_usuario           ON lg_login_usuario (id_usuario);
+-- Relatórios temporais (logins por data/hora)
+CREATE INDEX idx_login_data              ON lg_login_usuario (dt_hr_login);
+
+-- Métricas de Daily Active Users
+CREATE INDEX idx_dau_data                ON tb_daily_active_users (data);
+
+-- Otimizam relatórios que filtram por registros ativos/inativos ou atualizações recentes
+CREATE INDEX idx_updated_at_inactive     ON tb_usuario (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_m   ON tb_motorista (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_v   ON tb_viagem (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_inf ON tb_infracao (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_mid ON tb_midia_infracao (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_mc  ON tb_midia_concatenada (updated_at, is_inactive);
+
 COMMIT;
