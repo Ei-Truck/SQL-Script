@@ -33,6 +33,7 @@ drop view if exists vw_ocorrencias_por_gravidade;
 drop view if exists vw_motorista_quantidade_infracoes;
 drop view if exists vw_variacao_mes_passado;
 drop view if exists vw_ocorrencias_por_tipo;
+drop view if exists vw_quantidade_infracao_tipo_gravidade;
 drop procedure if exists prc_registrar_login_usuario;
 drop procedure if exists prc_atualiza_administrador;
 drop procedure if exists prc_atualiza_analista;
@@ -276,10 +277,7 @@ INSERT INTO tb_tipo_gravidade(nome) VALUES
 ('Leve'),
 ('Média'),
 ('Grave'),
-('Gravíssima'),
-('Crítica'),
-('Observacional'),
-('Informativo');
+('Gravíssima');
 
 -- 2) TIPO_OCORRENCIA
 INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
@@ -287,12 +285,12 @@ INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
 ('Frenagem brusca', 3,2),
 ('Aceleração brusca', 3,3),
 ('Colisão', 10,4),
-('Pane mecânica', 6,5),
+('Pane mecânica', 6,4),
 ('Desvio de rota', 4,1),
 ('Falha de comunicação', 2,2),
 ('Carga violada', 8,3),
 ('Parada não autorizada', 4,4),
-('Uso não autorizado', 7,5),
+('Uso não autorizado', 7,4),
 ('Uso de celular ao volante', 6, 3),
 ('Ultrapassagem indevida', 7, 4),
 ('Não uso de EPI (carga)', 4, 2),
@@ -301,8 +299,8 @@ INSERT INTO tb_tipo_infracao (nome, pontuacao, id_tipo_gravidade) VALUES
 ('Ignorar sinalização', 6, 3),
 ('Rodagem em faixa interditada', 5, 1),
 ('Velocidade incompatível com pista', 6, 3),
-('Falha no sistema de freio', 9, 5),
-('Atitude agressiva/roubo de carga', 10, 5);
+('Falha no sistema de freio', 9, 4),
+('Atitude agressiva/roubo de carga', 10, 4);
 
 -- 3) LOCALIDADE
 INSERT INTO tb_localidade (cep, rua, numero, bairro, estado, cidade, pais) VALUES
@@ -380,45 +378,42 @@ INSERT INTO tb_cargo (nome) VALUES
 ('Gerente de Análise'),
 ('Analista Regional'),
 ('Analista Local'),
-('Supervisor de Frota'),
-('Coordenador de Segurança'),
-('Tecnico de Manutenção'),
-('Operador de Rastreamento');
+('Analista Segmento');
 
 -- 7) USUARIO principal de QA
 INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, url_foto) VALUES
-('123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/1/profile_1.jpg');
+('123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 1, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/1/profile_1.jpg');
 
 -- 7.1) USUARIOS FAKE
 INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo) VALUES
-('987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
 ('321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
-('444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
-('222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
-('555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
-('888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
-('666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
+('111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2),
+('444.555.666-09', 5, 2, '2021-09-05', 'Ricardo Alves', '+11223377666' , 'ricardo.alves@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('777.888.999-15', 6, 1, '2015-11-12', 'Paula Mendes', '+21998877666', 'paula.mendes@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('222.333.444-98', 7, 2, '2016-03-30', 'Bruno Ferreira', '+21554433222', 'bruno.ferreira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 3),
+('555.666.777-20', 8, 1, '2022-04-18', 'Aline Costa', '+21223344555', 'aline.costa@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('888.999.000-05', 9, 3, '2018-06-25', 'Gustavo Pereira', '+21567788999', 'gustavo.pereira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
+('666.555.444-33', 10, 2, '2023-02-14', 'Larissa Martins', '+21223377666', 'larissa.martins@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 4),
 ('101.202.303-44', 11, 1, '2020-03-01', 'Lúcia Fernandes', '+5514999990001', 'lucia.fernandes@empresa.com', '$2a$12$hashfake1', 5),
-('202.303.404-55', 12, 1, '2019-07-15', 'Hugo Ribeiro', '+5512999990002', 'hugo.ribeiro@empresa.com', '$2a$12$hashfake2', 6),
-('303.404.505-66', 13, 2, '2021-11-21', 'Marina Sales', '+5531999990003', 'marina.sales@empresa.com', '$2a$12$hashfake3', 7),
+('202.303.404-55', 12, 1, '2019-07-15', 'Hugo Ribeiro', '+5512999990002', 'hugo.ribeiro@empresa.com', '$2a$12$hashfake2', 5),
+('303.404.505-66', 13, 2, '2021-11-21', 'Marina Sales', '+5531999990003', 'marina.sales@empresa.com', '$2a$12$hashfake3', 5),
 ('404.505.606-77', 14, 2, '2018-02-10', 'Anderson Lima', '+5571999990004', 'anderson.lima@empresa.com', '$2a$12$hashfake4', 5),
-('505.606.707-88', 15, 3, '2022-08-05', 'Camila Rocha', '+5541999990005', 'camila.rocha@empresa.com', '$2a$12$hashfake5', 6),
-('606.707.808-99', 16, 1, '2020-12-01', 'Diego Nunes', '+5571999990006', 'diego.nunes@empresa.com', '$2a$12$hashfake6', 7),
-('707.808.909-00', 17, 1, '2017-06-30', 'Patrícia Alves', '+5591999990007', 'patricia.alves@empresa.com', '$2a$12$hashfake7', 8),
-('808.909.010-11', 18, 2, '2016-09-18', 'Ronaldo Costa', '+5581999990008', 'ronaldo.costa@empresa.com', '$2a$12$hashfake8', 5),
-('909.010.111-22', 19, 3, '2015-01-04', 'Sofia Martins', '+559899990009',  'sofia.martins@empresa.com', '$2a$12$hashfake9', 6),
-('010.111.212-33', 20, 2, '2024-02-02', 'Igor Teixeira', '+5561999990010', 'igor.teixeira@empresa.com', '$2a$12$hashfake10', 7),
-('111.222.333-44', 11, 1, '2021-05-05', 'Natália Barros', '+5511999880011', 'natalia.barros@empresa.com', '$2a$12$hashfake11', 8),
-('222.333.444-55', 12, 1, '2019-10-10', 'Fábio Gomes', '+5513999880012', 'fabio.gomes@empresa.com', '$2a$12$hashfake12', 5),
-('333.444.555-66', 13, 2, '2018-12-12', 'Luan Pereira', '+5511999880013', 'luan.pereira@empresa.com', '$2a$12$hashfake13', 6),
-('444.555.666-77', 14, 2, '2022-03-03', 'Brenda Castro', '+5511999880014', 'brenda.castro@empresa.com', '$2a$12$hashfake14', 7),
-('555.666.777-88', 15, 1, '2020-06-06', 'Rita Moura', '+5511999880015', 'rita.moura@empresa.com', '$2a$12$hashfake15', 8),
+('505.606.707-88', 15, 3, '2022-08-05', 'Camila Rocha', '+5541999990005', 'camila.rocha@empresa.com', '$2a$12$hashfake5', 2),
+('606.707.808-99', 16, 1, '2020-12-01', 'Diego Nunes', '+5571999990006', 'diego.nunes@empresa.com', '$2a$12$hashfake6', 2),
+('707.808.909-00', 17, 1, '2017-06-30', 'Patrícia Alves', '+5591999990007', 'patricia.alves@empresa.com', '$2a$12$hashfake7', 2),
+('808.909.010-11', 18, 2, '2016-09-18', 'Ronaldo Costa', '+5581999990008', 'ronaldo.costa@empresa.com', '$2a$12$hashfake8', 3),
+('909.010.111-22', 19, 3, '2015-01-04', 'Sofia Martins', '+559899990009',  'sofia.martins@empresa.com', '$2a$12$hashfake9', 3),
+('010.111.212-33', 20, 2, '2024-02-02', 'Igor Teixeira', '+5561999990010', 'igor.teixeira@empresa.com', '$2a$12$hashfake10',3),
+('111.222.333-44', 11, 1, '2021-05-05', 'Natália Barros', '+5511999880011', 'natalia.barros@empresa.com', '$2a$12$hashfake11', 4),
+('222.333.444-55', 12, 1, '2019-10-10', 'Fábio Gomes', '+5513999880012', 'fabio.gomes@empresa.com', '$2a$12$hashfake12', 4),
+('333.444.555-66', 13, 2, '2018-12-12', 'Luan Pereira', '+5511999880013', 'luan.pereira@empresa.com', '$2a$12$hashfake13', 4),
+('444.555.666-77', 14, 2, '2022-03-03', 'Brenda Castro', '+5511999880014', 'brenda.castro@empresa.com', '$2a$12$hashfake14', 5),
+('555.666.777-88', 15, 1, '2020-06-06', 'Rita Moura', '+5511999880015', 'rita.moura@empresa.com', '$2a$12$hashfake15', 5),
 ('666.777.888-99', 16, 3, '2016-07-07', 'Eduarda Lima', '+5511999880016', 'eduarda.lima@empresa.com', '$2a$12$hashfake16', 5),
-('777.888.999-00', 17, 1, '2015-08-08', 'Mateus Cardoso', '+5511999880017', 'mateus.cardoso@empresa.com', '$2a$12$hashfake17', 6),
-('888.999.000-11', 18, 1, '2014-09-09', 'Helena Reis', '+5511999880018', 'helena.reis@empresa.com', '$2a$12$hashfake18', 7),
-('999.000.111-22', 19, 2, '2013-10-10', 'Thiago Pinto', '+5511999880019', 'thiago.pinto@empresa.com', '$2a$12$hashfake19', 8),
+('777.888.999-00', 17, 1, '2015-08-08', 'Mateus Cardoso', '+5511999880017', 'mateus.cardoso@empresa.com', '$2a$12$hashfake17', 2),
+('888.999.000-11', 18, 1, '2014-09-09', 'Helena Reis', '+5511999880018', 'helena.reis@empresa.com', '$2a$12$hashfake18', 3),
+('999.000.111-22', 19, 2, '2013-10-10', 'Thiago Pinto', '+5511999880019', 'thiago.pinto@empresa.com', '$2a$12$hashfake19', 4),
 ('000.111.222-33', 20, 3, '2023-11-11', 'Patricia Nascimento', '+5511999880020', 'patricia.nascimento@empresa.com', '$2a$12$hashfake20', 5);
 
 
@@ -963,16 +958,19 @@ SELECT
     u.nome            AS unidade,
     s.id              AS id_segmento,
     s.nome            AS segmento,
-    SUM(ti.pontuacao) AS pontuacao_ultimo_mes
+    SUM(ti.pontuacao) AS pontuacao_ultimo_mes,
+    u.id_localidade   AS id_localidade,
+    l.estado          AS localidade_estado
 FROM tb_infracao i
 JOIN public.tb_motorista m      ON i.id_motorista = m.id
 JOIN public.tb_tipo_infracao ti ON i.id_tipo_infracao = ti.id
 JOIN public.tb_unidade u        ON m.id_unidade = u.id
 JOIN public.tb_segmento s       ON u.id_segmento = s.id
+JOIN public.tb_localidade l     ON u.id_localidade = l.id
 WHERE
     EXTRACT(MONTH FROM i.dt_hr_evento) >= EXTRACT(MONTH FROM current_date) - 1
     AND EXTRACT(YEAR FROM i.dt_hr_evento) = EXTRACT(YEAR FROM current_date)
-GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome
+GROUP BY m.id, m.nome_completo, u.id, u.nome, s.id, s.nome, u.id_localidade, l.estado
 ORDER BY rank_pontuacao;
 
 
@@ -1098,6 +1096,63 @@ FROM tb_infracao o
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY t.nome, mes, ano;
 
+CREATE OR REPLACE VIEW vw_infracoes_motoristas_viagens (
+    id_motorista,
+    id_viagem,
+    nome_motorista,
+    url_midia_concatenada,
+    risco_motorista,
+    quantidade_infracao
+) AS
+WITH quantidade_infracoes_viagem_motorista AS (
+    SELECT
+        i.id_motorista,
+        i.id_viagem,
+        COUNT(i.id) AS quantidade_infracoes
+    FROM tb_infracao i
+    GROUP BY
+        i.id_motorista,
+        i.id_viagem
+)
+SELECT
+    q.id_motorista,
+    q.id_viagem,
+    m.nome_completo        AS nome_motorista,
+    mc.url                 AS url_midia_concatenada,
+    tr.nome                AS risco_motorista,
+    q.quantidade_infracoes AS quantidade_infracao
+FROM quantidade_infracoes_viagem_motorista q
+JOIN tb_motorista m
+    ON q.id_motorista = m.id
+JOIN tb_viagem v
+    ON q.id_viagem = v.id
+JOIN tb_midia_concatenada mc
+    ON v.id = mc.id_viagem
+JOIN tb_tipo_risco tr
+    ON m.id_tipo_risco = tr.id;
+
+
+CREATE OR REPLACE VIEW vw_quantidade_infracao_tipo_gravidade (
+    id_viagem,
+    id_motorista,
+    tipo_leve,
+    tipo_media,
+    tipo_grave,
+    tipo_gravissima
+) AS
+SELECT
+    v.id AS id_viagem,
+    m.id AS id_motorista,
+    SUM(CASE WHEN tg.nome = 'Leve' THEN 1 ELSE 0 END) AS tipo_leve,
+    SUM(CASE WHEN tg.nome = 'Média' THEN 1 ELSE 0 END) AS tipo_media,
+    SUM(CASE WHEN tg.nome = 'Grave' THEN 1 ELSE 0 END) AS tipo_grave,
+    SUM(CASE WHEN tg.nome = 'Gravíssima' THEN 1 ELSE 0 END) AS tipo_gravissima
+FROM tb_infracao i
+JOIN tb_viagem v ON i.id_viagem = v.id
+JOIN tb_motorista m ON i.id_motorista = m.id
+JOIN tb_tipo_infracao t ON i.id_tipo_infracao = t.id
+JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
+GROUP BY v.id, m.id;
 
 -- =============================
 -- PROCS
@@ -1318,5 +1373,96 @@ CREATE TRIGGER trg_atualizar_dau
 AFTER INSERT ON lg_login_usuario
 FOR EACH ROW
 EXECUTE FUNCTION fn_atualizar_dau();
+
+-- =============================
+-- ÍNDICES
+-- =============================
+
+
+-- Otimizam consultas que buscam tipos, gravidades ou unidades.
+-- Frequentemente usados em JOINs com tb_infracao e tb_viagem.
+CREATE INDEX idx_tipo_infracao_gravidade ON tb_tipo_infracao (id_tipo_gravidade);
+
+-- Acesso rápido a unidades por segmento (relatórios regionais, dashboards)
+CREATE INDEX idx_unidade_segmento        ON tb_unidade (id_segmento);
+-- Acesso rápido a unidades por localização (consultas geográficas ou filtros)
+CREATE INDEX idx_unidade_localidade      ON tb_unidade (id_localidade);
+
+-- Consultas de usuários por unidade e cargo (ex: “usuários de uma unidade”)
+CREATE INDEX idx_usuario_unidade         ON tb_usuario (id_unidade);
+CREATE INDEX idx_usuario_cargo           ON tb_usuario (id_cargo);
+
+-- Busca por e-mail e telefone em autenticação e gestão de contas
+CREATE INDEX idx_usuario_email           ON tb_usuario (email);
+CREATE INDEX idx_usuario_telefone        ON tb_usuario (telefone);
+
+-- JOINs entre caminhão, unidade e segmento — comuns em relatórios de frota
+CREATE INDEX idx_caminhao_segmento       ON tb_caminhao (id_segmento);
+CREATE INDEX idx_caminhao_unidade        ON tb_caminhao (id_unidade);
+
+-- Busca direta de caminhões por placa ou número de frota (consultas administrativas)
+CREATE INDEX idx_caminhao_placa          ON tb_caminhao (placa);
+CREATE INDEX idx_caminhao_num_frota      ON tb_caminhao (numero_frota);
+
+-- JOINs com unidade e tipo de risco em relatórios de desempenho
+CREATE INDEX idx_motorista_unidade       ON tb_motorista (id_unidade);
+CREATE INDEX idx_motorista_tipo_risco    ON tb_motorista (id_tipo_risco);
+
+-- Busca rápida de motorista por CPF (consultas e validações)
+CREATE INDEX idx_motorista_cpf           ON tb_motorista (cpf);
+
+-- Melhoram os JOINs mais comuns: viagem ↔ caminhão / usuário / localidade
+CREATE INDEX idx_viagem_caminhao         ON tb_viagem (id_caminhao);
+CREATE INDEX idx_viagem_usuario          ON tb_viagem (id_usuario);
+CREATE INDEX idx_viagem_origem           ON tb_viagem (id_origem);
+CREATE INDEX idx_viagem_destino          ON tb_viagem (id_destino);
+
+-- Filtros frequentes por datas de início/fim (relatórios, análises mensais)
+CREATE INDEX idx_viagem_dt_inicio        ON tb_viagem (dt_hr_inicio);
+CREATE INDEX idx_viagem_dt_fim           ON tb_viagem (dt_hr_fim);
+
+-- Flag de viagens já analisadas — usada em painéis e dashboards
+CREATE INDEX idx_viagem_was_analyzed     ON tb_viagem (was_analyzed);
+
+-- JOINs e relatórios de registros por viagem e motorista
+CREATE INDEX idx_registro_viagem         ON tb_registro (id_viagem);
+CREATE INDEX idx_registro_motorista      ON tb_registro (id_motorista);
+
+-- Filtros por data de registro (histórico de tratativas)
+CREATE INDEX idx_registro_dt             ON tb_registro (dt_hr_registro);
+
+-- JOINs com viagem, motorista e tipo de infração (consultas analíticas e dashboards)
+CREATE INDEX idx_infracao_viagem         ON tb_infracao (id_viagem);
+CREATE INDEX idx_infracao_motorista      ON tb_infracao (id_motorista);
+CREATE INDEX idx_infracao_tipo           ON tb_infracao (id_tipo_infracao);
+
+-- Consultas por data e localização (mapas de calor, gráficos temporais)
+CREATE INDEX idx_infracao_dt_evento      ON tb_infracao (dt_hr_evento);
+CREATE INDEX idx_infracao_coords         ON tb_infracao (latitude, longitude);
+
+-- JOINs frequentes nas views de relatórios de mídia
+CREATE INDEX idx_midia_infracao_viagem    ON tb_midia_infracao (id_viagem);
+CREATE INDEX idx_midia_infracao_motorista ON tb_midia_infracao (id_motorista);
+CREATE INDEX idx_midia_infracao_infracao  ON tb_midia_infracao (id_infracao);
+
+-- Consulta rápida das mídias concatenadas por viagem e motorista
+CREATE INDEX idx_midia_concat_viagem      ON tb_midia_concatenada (id_viagem);
+CREATE INDEX idx_midia_concat_motorista   ON tb_midia_concatenada (id_motorista);
+
+-- JOINs e contagens de logins por usuário (relatórios de acesso)
+CREATE INDEX idx_login_usuario           ON lg_login_usuario (id_usuario);
+-- Relatórios temporais (logins por data/hora)
+CREATE INDEX idx_login_data              ON lg_login_usuario (dt_hr_login);
+
+-- Métricas de Daily Active Users
+CREATE INDEX idx_dau_data                ON tb_daily_active_users (data);
+
+-- Otimizam relatórios que filtram por registros ativos/inativos ou atualizações recentes
+CREATE INDEX idx_updated_at_inactive     ON tb_usuario (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_m   ON tb_motorista (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_v   ON tb_viagem (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_inf ON tb_infracao (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_mid ON tb_midia_infracao (updated_at, is_inactive);
+CREATE INDEX idx_updated_at_inactive_mc  ON tb_midia_concatenada (updated_at, is_inactive);
 
 COMMIT;
