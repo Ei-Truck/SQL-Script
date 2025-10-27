@@ -935,12 +935,12 @@ CREATE VIEW vw_ocorrencia_por_viagem (
     total_ocorrencias
 ) AS
 SELECT
-    COUNT(o.id) AS total_ocorrencias,
-    v.id        AS id_viagem
+    v.id        AS id_viagem,
+    COUNT(o.id) AS total_ocorrencias
 FROM tb_infracao o
 JOIN tb_viagem v ON o.id_viagem = v.id
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
-GROUP BY v.id, t.nome;
+GROUP BY v.id;
 
 CREATE VIEW vw_motorista_pontuacao_mensal(
     ranking_pontuacao,
@@ -975,18 +975,18 @@ ORDER BY rank_pontuacao;
 
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
-    dia_semana,
     total_infracoes,
     id_unidade,
     id_localidade,
-    id_segmento
+    id_segmento,
+    dia_semana
 ) AS
 SELECT
-    TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
-    COUNT(*) AS total_infracoes,
     m.id_unidade,
     u.id_localidade,
-    u.id_segmento
+    u.id_segmento,
+    TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
+    COUNT(*) AS total_infracoes
 FROM tb_infracao i
 JOIN tb_motorista m ON i.id_motorista = m.id
 JOIN tb_unidade u ON i.transaction_made = u.transaction_made
@@ -997,18 +997,18 @@ ORDER BY TO_CHAR(dt_hr_evento, 'FMDay');
 
 
 CREATE VIEW vw_total_ocorrencias (
-    total_ocorrencias,
     mes,
     ano,
     id_unidade,
-    id_localidade
+    id_localidade,
+    total_ocorrencias
 ) AS
 SELECT
-    COUNT(o.id) AS total_ocorrencias,
     extract(month from dt_hr_evento) mes,
     extract(year from dt_hr_evento) ano,
     m.id_unidade,
-    u.id_localidade
+    u.id_localidade,
+    COUNT(o.id) AS total_ocorrencias
 FROM tb_infracao o
 JOIN tb_motorista m ON o.id_motorista = m.id
 JOIN tb_unidade u ON m.id_unidade = u.id
@@ -1017,59 +1017,64 @@ order by ano desc, mes desc;
 
 
 CREATE VIEW vw_ocorrencias_por_gravidade (
-    total_ocorrencias,
-    gravidade,
     mes,
     ano,
     id_unidade,
-    id_localidade
+    id_localidade,
+    total_ocorrencias,
+    gravidade
 ) AS
 SELECT
-    COUNT(o.id) AS total_ocorrencias,
-    tg.nome AS gravidade,
     extract(month from dt_hr_evento) mes,
     extract(year from dt_hr_evento) ano,
     m.id_unidade,
-    u.id_localidade
+    u.id_localidade,
+    COUNT(o.id) AS total_ocorrencias,
+    tg.nome AS gravidade
 FROM tb_infracao o
 JOIN tb_tipo_infracao t     ON o.id_tipo_infracao = t.id
 JOIN tb_tipo_gravidade tg   ON t.id_tipo_gravidade = tg.id
 JOIN tb_motorista m on o.id_motorista = m.id
 JOIN tb_unidade u on m.id_unidade = u.id
-GROUP BY tg.nome, mes, ano, m.id_unidade, u.id_localidade;
+GROUP BY tg.nome, mes, ano, m.id_unidade, u.id;
 
 
 CREATE VIEW vw_motorista_quantidade_infracoes (
-    motorista,
-    quantidade_infracoes,
     mes,
     ano,
     id_unidade,
-    id_localidade
+    id_localidade,
+    motorista,
+    quantidade_infracoes
 ) AS
 SELECT
-    m.nome_completo as motorista,
-    count(i.id) as quantidade_infracoes,
     extract(month from dt_hr_evento) mes,
     extract(year from dt_hr_evento) ano,
     m.id_unidade,
-    u.id_localidade
+    u.id_localidade,
+    m.nome_completo as motorista,
+    count(i.id) as quantidade_infracoes
 FROM tb_motorista m
 JOIN tb_infracao i on m.id = i.id_motorista
 JOIN tb_unidade u on m.id_unidade = u.id
-group by m.nome_completo, mes, ano, m.id_unidade, u.id_localidade
-order by quantidade_infracoes;
+group by m.nome_completo, mes, ano, m.id_unidade, u.id
+order by quantidade_infracoes desc;
 
 
 CREATE VIEW vw_variacao_mes_passado_por_mes_ano AS
 WITH totais AS (
     SELECT
+        u.id AS id_unidade,
+        u.id_localidade AS id_localidade,
         EXTRACT(MONTH FROM dt_hr_evento) AS mes,
         EXTRACT(YEAR FROM dt_hr_evento) AS ano,
         COUNT(*) AS total_infracoes
-    FROM tb_infracao
-    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento)
+    FROM tb_infracao i
+    JOIN tb_unidade u on i.transaction_made = u.transaction_made
+    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id
 ) SELECT
+    t1.id_unidade,
+    t1.id_localidade,
     t1.mes,
     t1.ano,
     t1.total_infracoes AS infracoes_mes_atual,
@@ -1080,25 +1085,32 @@ LEFT JOIN totais t2 ON t1.mes = t2.mes + 1 AND t1.ano = t2.ano;
 
 
 CREATE VIEW vw_ocorrencias_por_tipo (
+    mes,
+    ano,
+    id_unidade,
+    id_localidade,
     tipo_infracao,
     total_ocorrencias,
-    porcentagem_do_total,
-    mes,
-    ano
+    porcentagem_do_total
 ) AS
 SELECT
+    extract(month from dt_hr_evento) mes,
+    extract(year from dt_hr_evento) ano,
+    u.id AS id_unidade,
+    u.id_localidade,
     t.nome AS tipo_infracao,
     COUNT(o.id) AS total_ocorrencias,
-    ROUND((COUNT(o.id)::decimal / SUM(COUNT(o.id)) OVER (PARTITION BY extract(month from dt_hr_evento), extract(year from dt_hr_evento))) * 100, 2) AS porcentagem_do_total,
-    extract(month from dt_hr_evento) mes,
-    extract(year from dt_hr_evento) ano
+    ROUND((COUNT(o.id)::decimal / SUM(COUNT(o.id)) OVER (PARTITION BY extract(month from dt_hr_evento), extract(year from dt_hr_evento))) * 100, 2) AS porcentagem_do_total
 FROM tb_infracao o
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
-GROUP BY t.nome, mes, ano;
+JOIN tb_unidade u ON o.transaction_made = u.transaction_made
+GROUP BY t.nome, mes, ano, u.id;
 
 CREATE OR REPLACE VIEW vw_infracoes_motoristas_viagens (
     id_motorista,
     id_viagem,
+    id_unidade,
+    id_localidade,
     nome_motorista,
     url_midia_concatenada,
     risco_motorista,
@@ -1117,6 +1129,8 @@ WITH quantidade_infracoes_viagem_motorista AS (
 SELECT
     q.id_motorista,
     q.id_viagem,
+    m.id_unidade         AS id_unidade,
+    u.id_localidade      AS id_localidade,
     m.nome_completo        AS nome_motorista,
     mc.url                 AS url_midia_concatenada,
     tr.nome                AS risco_motorista,
@@ -1129,18 +1143,24 @@ JOIN tb_viagem v
 JOIN tb_midia_concatenada mc
     ON v.id = mc.id_viagem
 JOIN tb_tipo_risco tr
-    ON m.id_tipo_risco = tr.id;
+    ON m.id_tipo_risco = tr.id
+JOIN tb_unidade u
+    ON m.id_unidade = u.id;
 
 
 CREATE OR REPLACE VIEW vw_quantidade_infracao_tipo_gravidade (
     id_viagem,
     id_motorista,
+    id_unidade,
+    id_localidade,
     tipo_leve,
     tipo_media,
     tipo_grave,
     tipo_gravissima
 ) AS
 SELECT
+    m.id_unidade AS id_unidade,
+    u.id_localidade AS id_localidade,
     v.id AS id_viagem,
     m.id AS id_motorista,
     SUM(CASE WHEN tg.nome = 'Leve' THEN 1 ELSE 0 END) AS tipo_leve,
@@ -1152,7 +1172,9 @@ JOIN tb_viagem v ON i.id_viagem = v.id
 JOIN tb_motorista m ON i.id_motorista = m.id
 JOIN tb_tipo_infracao t ON i.id_tipo_infracao = t.id
 JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
-GROUP BY v.id, m.id;
+JOIN tb_unidade u ON u.id = m.id_unidade
+GROUP BY v.id, m.id, u.id;
+
 
 -- =============================
 -- PROCS
