@@ -929,14 +929,16 @@ JOIN tb_viagem v ON o.id_viagem = v.id
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id;
 
-CREATE VIEW vw_motorista_pontuacao_mensal(
+CREATE OR REPLACE VIEW vw_motorista_pontuacao_mensal(
     ranking_pontuacao,
     motorista,
     id_unidade,
     unidade,
     id_segmento,
     segmento,
-    pontuacao_ultimo_mes
+    pontuacao_ultimo_mes,
+    id_localidade,
+    localidade_estado
 ) AS
 SELECT
     DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
