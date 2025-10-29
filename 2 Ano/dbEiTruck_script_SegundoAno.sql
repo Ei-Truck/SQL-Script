@@ -1095,7 +1095,7 @@ JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 JOIN tb_unidade u ON o.transaction_made = u.transaction_made
 GROUP BY t.nome, mes, ano, u.id;
 
-CREATE OR REPLACE VIEW vw_infracoes_motoristas_viagens (
+CREATE VIEW vw_infracoes_motoristas_viagens (
     id_motorista,
     id_viagem,
     id_unidade,
