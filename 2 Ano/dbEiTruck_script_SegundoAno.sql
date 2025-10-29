@@ -883,16 +883,16 @@ order by v.id;
 
 
 CREATE VIEW vw_visao_basica_viagem (
-                                    id_viagem,
-                                    placa_caminhao,
-                                    data_inicio_viagem,
-                                    data_fim_viagem,
-                                    km_viagem,
-                                    id_segmento,
-                                    segmento,
-                                    id_unidade,
-                                    unidade,
-                                    id_localidade
+    id_viagem,
+    placa_caminhao,
+    data_inicio_viagem,
+    data_fim_viagem,
+    km_viagem,
+    id_segmento,
+    segmento,
+    id_unidade,
+    unidade,
+    id_localidade
     ) AS
 SELECT
     v.id            AS id_viagem,
