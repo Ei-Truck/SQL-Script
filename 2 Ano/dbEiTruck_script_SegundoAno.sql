@@ -892,13 +892,8 @@ CREATE VIEW vw_visao_basica_viagem (
     segmento,
     id_unidade,
     unidade,
-    id_localidade,
-    nome_motorista,
-    risco_motorista,
-    url_midia_concatenada,
-    tipo_gravidade,
-    tipo_infracao
-) AS
+    id_localidade
+    ) AS
 SELECT
     v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
@@ -909,24 +904,16 @@ SELECT
     s.nome          AS segmento,
     u.id            AS id_unidade,
     u.nome          AS unidade,
-    l.id            AS id_localidade,
-    m.nome_completo AS nome_motorista,
-    tr.nome         AS risco_motorista,
-    mc.url          AS url_midia_concatenada,
-    tg.nome         AS tipo_gravidade,
-    t.nome          AS tipo_infracao
+    l.id            AS id_localidade
 FROM tb_viagem v
-JOIN tb_infracao o            ON o.id_viagem = v.id
-JOIN tb_motorista m          ON m.id = o.id_motorista
-JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
-JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
-JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
-JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
-JOIN tb_unidade u            ON u.id = m.id_unidade
-JOIN tb_segmento s           ON s.id = m.id_unidade
-JOIN tb_caminhao c           ON c.id = v.id_caminhao
-JOIN tb_localidade l on u.id_localidade = l.id
-GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, tr.nome, mc.url, tg.nome, t.nome, m.id_unidade, s.id, u.id, l.id
+         JOIN tb_infracao o            ON o.id_viagem = v.id
+         JOIN tb_motorista m          ON m.id = o.id_motorista
+         JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
+         JOIN tb_unidade u            ON u.id = m.id_unidade
+         JOIN tb_segmento s           ON s.id = m.id_unidade
+         JOIN tb_caminhao c           ON c.id = v.id_caminhao
+         JOIN tb_localidade l on u.id_localidade = l.id
+GROUP BY v.id, c.placa, v.dt_hr_inicio, v.dt_hr_fim, s.nome, u.nome, m.nome_completo, m.id_unidade, s.id, u.id, l.id
 ORDER BY v.id;
 
 
@@ -942,14 +929,16 @@ JOIN tb_viagem v ON o.id_viagem = v.id
 JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 GROUP BY v.id;
 
-CREATE VIEW vw_motorista_pontuacao_mensal(
+CREATE OR REPLACE VIEW vw_motorista_pontuacao_mensal(
     ranking_pontuacao,
     motorista,
     id_unidade,
     unidade,
     id_segmento,
     segmento,
-    pontuacao_ultimo_mes
+    pontuacao_ultimo_mes,
+    id_localidade,
+    localidade_estado
 ) AS
 SELECT
     DENSE_RANK() OVER (ORDER BY SUM(ti.pontuacao) DESC) AS rank_pontuacao,
@@ -1106,7 +1095,7 @@ JOIN tb_tipo_infracao t ON o.id_tipo_infracao = t.id
 JOIN tb_unidade u ON o.transaction_made = u.transaction_made
 GROUP BY t.nome, mes, ano, u.id;
 
-CREATE OR REPLACE VIEW vw_infracoes_motoristas_viagens (
+CREATE VIEW vw_infracoes_motoristas_viagens (
     id_motorista,
     id_viagem,
     id_unidade,
