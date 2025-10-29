@@ -41,12 +41,7 @@ Além disso, existem tabelas de apoio como:
 
 ## 📦 Como Executar o Script
 
-### 1️⃣ Certifique-se de estar usando PostgreSQL
-```sql
-SELECT version();
-```
-
-### 2️⃣ Copie o conteúdo do arquivo `.sql` para sua ferramenta:
+### 1️⃣ abra o arquivo `.sql` na sua ferramenta:
 - DBeaver
 - PgAdmin
 - DataGrip
