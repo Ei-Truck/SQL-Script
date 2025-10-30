@@ -1096,73 +1096,75 @@ JOIN tb_unidade u ON o.transaction_made = u.transaction_made
 GROUP BY t.nome, mes, ano, u.id;
 
 CREATE VIEW vw_infracoes_motoristas_viagens (
-    id_motorista,
-    id_viagem,
-    id_unidade,
-    id_localidade,
-    nome_motorista,
-    url_midia_concatenada,
-    risco_motorista,
-    quantidade_infracao
+	id_motorista,
+	id_viagem,
+	id_unidade,
+	id_localidade,
+	nome_motorista,
+	url_midia_concatenada,
+	risco_motorista,
+	quantidade_infracao
 ) AS
 WITH quantidade_infracoes_viagem_motorista AS (
-    SELECT
-        i.id_motorista,
-        i.id_viagem,
-        COUNT(i.id) AS quantidade_infracoes
-    FROM tb_infracao i
-    GROUP BY
-        i.id_motorista,
-        i.id_viagem
-)
+	SELECT
+		i.id_motorista,
+		i.id_viagem,
+		COUNT(i.id) AS quantidade_infracoes
+	FROM tb_infracao i
+	GROUP BY
+		i.id_motorista,
+		i.id_viagem
+),
+ midia_por_viagem AS (
+	 SELECT
+		 id_viagem,
+		 STRING_AGG(url, ', ') AS url_midia_concatenada
+	 FROM tb_midia_concatenada
+	 GROUP BY id_viagem
+ )
 SELECT
     q.id_motorista,
     q.id_viagem,
     m.id_unidade         AS id_unidade,
     u.id_localidade      AS id_localidade,
-    m.nome_completo        AS nome_motorista,
-    mc.url                 AS url_midia_concatenada,
-    tr.nome                AS risco_motorista,
+    m.nome_completo      AS nome_motorista,
+    mc.url_midia_concatenada,
+    tr.nome              AS risco_motorista,
     q.quantidade_infracoes AS quantidade_infracao
 FROM quantidade_infracoes_viagem_motorista q
-JOIN tb_motorista m
-    ON q.id_motorista = m.id
-JOIN tb_viagem v
-    ON q.id_viagem = v.id
-JOIN tb_midia_concatenada mc
-    ON v.id = mc.id_viagem
-JOIN tb_tipo_risco tr
-    ON m.id_tipo_risco = tr.id
-JOIN tb_unidade u
-    ON m.id_unidade = u.id;
+JOIN tb_motorista m ON q.id_motorista = m.id
+JOIN tb_viagem v ON q.id_viagem = v.id
+LEFT JOIN midia_por_viagem mc ON v.id = mc.id_viagem
+LEFT JOIN tb_tipo_risco tr ON m.id_tipo_risco = tr.id
+LEFT JOIN tb_unidade u ON m.id_unidade = u.id;
 
 
-CREATE OR REPLACE VIEW vw_quantidade_infracao_tipo_gravidade (
-    id_viagem,
-    id_motorista,
-    id_unidade,
-    id_localidade,
-    tipo_leve,
-    tipo_media,
-    tipo_grave,
-    tipo_gravissima
+CREATE VIEW vw_quantidade_infracao_tipo_gravidade (
+  id_viagem,
+  id_motorista,
+  id_unidade,
+  id_localidade,
+  tipo_leve,
+  tipo_media,
+  tipo_grave,
+  tipo_gravissima
 ) AS
 SELECT
-    m.id_unidade AS id_unidade,
-    u.id_localidade AS id_localidade,
-    v.id AS id_viagem,
-    m.id AS id_motorista,
-    SUM(CASE WHEN tg.nome = 'Leve' THEN 1 ELSE 0 END) AS tipo_leve,
-    SUM(CASE WHEN tg.nome = 'Média' THEN 1 ELSE 0 END) AS tipo_media,
-    SUM(CASE WHEN tg.nome = 'Grave' THEN 1 ELSE 0 END) AS tipo_grave,
-    SUM(CASE WHEN tg.nome = 'Gravíssima' THEN 1 ELSE 0 END) AS tipo_gravissima
+	v.id AS id_viagem,
+	m.id AS id_motorista,
+	m.id_unidade AS id_unidade,
+	u.id_localidade AS id_localidade,
+	SUM(CASE WHEN tg.nome = 'Leve' THEN 1 ELSE 0 END) AS tipo_leve,
+	SUM(CASE WHEN tg.nome = 'Média' THEN 1 ELSE 0 END) AS tipo_media,
+	SUM(CASE WHEN tg.nome = 'Grave' THEN 1 ELSE 0 END) AS tipo_grave,
+	SUM(CASE WHEN tg.nome = 'Gravíssima' THEN 1 ELSE 0 END) AS tipo_gravissima
 FROM tb_infracao i
 JOIN tb_viagem v ON i.id_viagem = v.id
 JOIN tb_motorista m ON i.id_motorista = m.id
-JOIN tb_tipo_infracao t ON i.id_tipo_infracao = t.id
-JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
-JOIN tb_unidade u ON u.id = m.id_unidade
-GROUP BY v.id, m.id, u.id;
+LEFT JOIN tb_tipo_infracao t ON i.id_tipo_infracao = t.id
+LEFT JOIN tb_tipo_gravidade tg ON t.id_tipo_gravidade = tg.id
+LEFT JOIN tb_unidade u ON m.id_unidade = u.id
+GROUP BY v.id, m.id, u.id, m.id_unidade;
 
 
 -- =============================
