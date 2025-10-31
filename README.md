@@ -47,6 +47,6 @@ Além disso, existem tabelas de apoio como:
 - DataGrip
 - psql terminal
 
-### 3️⃣ Execute o script
+### 2️⃣ Execute o script
 
 ---
