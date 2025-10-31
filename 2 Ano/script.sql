@@ -520,6 +520,7 @@ WITH totais AS (
     GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id, u.id_segmento
 ) SELECT
     t1.id_unidade,
+    t2.id_segmento,
     t1.id_localidade,
     t1.mes,
     t1.ano,
