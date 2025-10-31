@@ -505,8 +505,8 @@ group by m.nome_completo, mes, ano, m.id_unidade, u.id_segmento, u.id
 order by quantidade_infracoes desc;
 
 
-CREATE VIEW vw_variacao_mes_passado_por_mes_ano AS
-WITH totais AS (
+CREATE OR REPLACE VIEW vw_variacao_mes_passado_por_mes_ano AS
+WITH totais_mes_atual AS (
     SELECT
         u.id AS id_unidade,
         u.id_segmento AS id_segmento,
@@ -515,20 +515,37 @@ WITH totais AS (
         EXTRACT(YEAR FROM dt_hr_evento) AS ano,
         COUNT(*) AS total_infracoes
     FROM tb_infracao i
-    JOIN tb_motorista m ON i.id_motorista = m.id
-    JOIN tb_unidade u ON m.id_unidade = u.id
+             JOIN tb_motorista m ON i.id_motorista = m.id
+             JOIN tb_unidade u ON m.id_unidade = u.id
+    WHERE EXTRACT(MONTH FROM dt_hr_evento) = EXTRACT(MONTH FROM CURRENT_DATE)
+      AND EXTRACT(YEAR FROM dt_hr_evento) = EXTRACT(YEAR FROM CURRENT_DATE)
     GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id, u.id_segmento
-) SELECT
-    t1.id_unidade,
-    t2.id_segmento,
-    t1.id_localidade,
-    t1.mes,
-    t1.ano,
-    t1.total_infracoes AS infracoes_mes_atual,
-    t2.total_infracoes AS infracoes_mes_passado,
-    ((t1.total_infracoes - t2.total_infracoes)::numeric / NULLIF(t2.total_infracoes, 0)) * 100 AS variacao
-FROM totais t1
-LEFT JOIN totais t2 ON t1.mes = t2.mes + 1 AND t1.ano = t2.ano;
+),
+totais_mes_passado AS(
+    SELECT
+        u.id AS id_unidade,
+        u.id_segmento AS id_segmento,
+        u.id_localidade AS id_localidade,
+        EXTRACT(MONTH FROM dt_hr_evento) AS mes,
+        EXTRACT(YEAR FROM dt_hr_evento) AS ano,
+        COUNT(*) AS total_infracoes
+    FROM tb_infracao i
+             JOIN tb_motorista m ON i.id_motorista = m.id
+             JOIN tb_unidade u ON m.id_unidade = u.id
+    WHERE EXTRACT(MONTH FROM dt_hr_evento) = EXTRACT(MONTH FROM CURRENT_DATE) - 1
+      AND EXTRACT(YEAR FROM dt_hr_evento) = EXTRACT(YEAR FROM CURRENT_DATE)
+    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id, u.id_segmento
+)
+SELECT DISTINCT
+      t1.id_unidade,
+      t1.id_segmento,
+      t1.id_localidade,
+      t1.mes,
+      t1.ano,
+      t1.total_infracoes AS infracoes_mes_atual,
+      t2.total_infracoes AS infracoes_mes_passado,
+      ((t1.total_infracoes - t2.total_infracoes)::numeric / NULLIF(t2.total_infracoes, 0)) * 100 AS variacao
+FROM totais_mes_atual t1, totais_mes_passado t2;
 
 
 CREATE VIEW vw_ocorrencias_por_tipo (
