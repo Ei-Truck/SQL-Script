@@ -1,3 +1,7 @@
+ROLLBACK;
+
+BEGIN;
+
 -- =============================
 -- LOAD
 -- =============================
@@ -149,13 +153,15 @@ INSERT INTO tb_tipo_risco (nome, descricao) VALUES
     ('Treinamento', 'Requer treinamento complementar.'),
     ('Manutenção', 'Associado a veículos com problemas.');
 -- 9) MOTORISTA
+INSERT INTO tb_motorista (cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco, url_foto) VALUES
+    ('123.123.123-12', 1, 'MG1234567', 'Paulo Gomes', '(11)98888-1111', 'paulo.gomes@empresa.com', 1, 'https://campoenegocios.com/wp-content/uploads/2022/09/iStock-861966338-1.jpg'),
+    ('234.234.234-23', 2, 'SP2345678', 'Rodrigo Santos', '(19)97777-2222', 'rodrigo.santos@empresa.com', 2, 'https://brasilcaminhoneiro.com.br/wp-content/uploads/2017/06/jeime_lima_face-529x800.jpg'),
+    ('678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 1, 'https://brasilcaminhoneiro.com.br/wp-content/uploads/2017/06/martiliano_face.jpg');
+
 INSERT INTO tb_motorista (cpf, id_unidade, cnh, nome_completo, telefone, email_empresa, id_tipo_risco) VALUES
-    ('123.123.123-12', 1, 'MG1234567', 'Paulo Gomes', '(11)98888-1111', 'paulo.gomes@empresa.com', 1),
-    ('234.234.234-23', 2, 'SP2345678', 'Rodrigo Santos', '(19)97777-2222', 'rodrigo.santos@empresa.com', 2),
     ('345.345.345-34', 3, 'RJ3456789', 'Marcelo Almeida', '(21)96666-3333', 'marcelo.almeida@empresa.com', 3),
     ('456.456.456-45', 4, 'PR4567890', 'Felipe Rocha', '(41)95555-4444', 'felipe.rocha@empresa.com', 4),
     ('567.567.567-56', 5, 'MG5678901', 'Renato Dias', '(31)94444-5555', 'renato.dias@empresa.com', 5),
-    ('678.678.678-67', 6, 'RS6789012', 'Eduardo Moraes', '(51)93333-6666', 'eduardo.moraes@empresa.com', 1),
     ('789.789.789-78', 7, 'PE7890123', 'André Ferreira', '(81)92222-7777', 'andre.ferreira@empresa.com', 2),
     ('890.890.890-89', 8, 'BA8901234', 'Thiago Campos', '(71)91111-8888', 'thiago.campos@empresa.com', 3),
     ('901.901.901-90', 9, 'GO9012345', 'Diego Farias', '(62)90000-9999', 'diego.farias@empresa.com', 4),
@@ -567,3 +573,6 @@ INSERT INTO tb_infracao (id_viagem, id_motorista, dt_hr_evento, id_tipo_infracao
     (12, 2, '2025-10-24 10:10:00', 2, -22.909938, -47.062633, 72.0),
     (13, 3, '2025-10-25 08:55:00', 3, -22.906847, -43.172896, 88.7),
     (14, 4, '2025-10-26 11:20:00', 4, -25.428356, -49.273251, 40.0);
+
+
+COMMIT;
