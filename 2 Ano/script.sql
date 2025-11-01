@@ -415,24 +415,32 @@ ORDER BY rank_pontuacao;
 
 
 CREATE VIEW vw_relatorio_semanal_infracoes(
-dia_semana,
-total_infracoes,
-id_unidade,
-id_segmento,
-id_localidade
-)AS
+    dia_semana,
+    total_infracoes,
+    id_unidade,
+    id_segmento,
+    id_localidade
+) AS
 SELECT
-    TO_CHAR(dt_hr_evento, 'FMDay') AS dia_semana,
+    CASE EXTRACT(ISODOW FROM dt_hr_evento)
+        WHEN 1 THEN 'Segunda-feira'
+        WHEN 2 THEN 'Terça-feira'
+        WHEN 3 THEN 'Quarta-feira'
+        WHEN 4 THEN 'Quinta-feira'
+        WHEN 5 THEN 'Sexta-feira'
+        WHEN 6 THEN 'Sábado'
+        WHEN 7 THEN 'Domingo'
+    END AS dia_semana,
     COUNT(*) AS total_infracoes,
     u.id AS id_unidade,
     u.id_segmento,
     u.id_localidade
 FROM tb_infracao i
-        JOIN tb_motorista m ON i.id_motorista = m.id
-        JOIN tb_unidade u ON m.id_unidade = u.id
-WHERE dt_hr_evento >= CURRENT_DATE - interval '1 week'
-GROUP BY TO_CHAR(dt_hr_evento, 'FMDay'), u.id
-ORDER BY TO_CHAR(dt_hr_evento, 'FMDay') DESC;
+         JOIN tb_motorista m ON i.id_motorista = m.id
+         JOIN tb_unidade u ON m.id_unidade = u.id
+WHERE dt_hr_evento >= CURRENT_DATE - INTERVAL '1 week'
+GROUP BY EXTRACT(ISODOW FROM dt_hr_evento), u.id, u.id_segmento, u.id_localidade
+ORDER BY EXTRACT(ISODOW FROM dt_hr_evento);
 
 
 CREATE VIEW vw_total_ocorrencias (
@@ -512,30 +520,36 @@ WITH totais_mes_atual AS (
         u.id AS id_unidade,
         u.id_segmento AS id_segmento,
         u.id_localidade AS id_localidade,
-        EXTRACT(MONTH FROM dt_hr_evento) AS mes,
-        EXTRACT(YEAR FROM dt_hr_evento) AS ano,
+        EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) AS mes,
+        EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) AS ano,
         COUNT(*) AS total_infracoes
     FROM tb_infracao i
              JOIN tb_motorista m ON i.id_motorista = m.id
              JOIN tb_unidade u ON m.id_unidade = u.id
-    WHERE EXTRACT(MONTH FROM dt_hr_evento) = EXTRACT(MONTH FROM CURRENT_DATE)
-      AND EXTRACT(YEAR FROM dt_hr_evento) = EXTRACT(YEAR FROM CURRENT_DATE)
-    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id, u.id_segmento
+    WHERE EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) = EXTRACT(MONTH FROM (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo'))
+      AND EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) = EXTRACT(YEAR FROM (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo'))
+    GROUP BY EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')),
+             EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')),
+             u.id_localidade, u.id, u.id_segmento
 ),
-totais_mes_passado AS(
+totais_mes_passado AS (
     SELECT
         u.id AS id_unidade,
         u.id_segmento AS id_segmento,
         u.id_localidade AS id_localidade,
-        EXTRACT(MONTH FROM dt_hr_evento) AS mes,
-        EXTRACT(YEAR FROM dt_hr_evento) AS ano,
+        EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) AS mes,
+        EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) AS ano,
         COUNT(*) AS total_infracoes
     FROM tb_infracao i
              JOIN tb_motorista m ON i.id_motorista = m.id
              JOIN tb_unidade u ON m.id_unidade = u.id
-    WHERE EXTRACT(MONTH FROM dt_hr_evento) = EXTRACT(MONTH FROM CURRENT_DATE) - 1
-      AND EXTRACT(YEAR FROM dt_hr_evento) = EXTRACT(YEAR FROM CURRENT_DATE)
-    GROUP BY EXTRACT(YEAR FROM dt_hr_evento), EXTRACT(MONTH FROM dt_hr_evento), u.id_localidade, u.id, u.id_segmento
+    WHERE EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) =
+              EXTRACT(MONTH FROM (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo') - INTERVAL '1 month')
+      AND EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')) =
+              EXTRACT(YEAR FROM (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo') - INTERVAL '1 month')
+    GROUP BY EXTRACT(YEAR FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')),
+             EXTRACT(MONTH FROM (i.dt_hr_evento AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')),
+             u.id_localidade, u.id, u.id_segmento
 )
 SELECT DISTINCT
       t1.id_unidade,
@@ -546,7 +560,11 @@ SELECT DISTINCT
       t1.total_infracoes AS infracoes_mes_atual,
       t2.total_infracoes AS infracoes_mes_passado,
       ((t1.total_infracoes - t2.total_infracoes)::numeric / NULLIF(t2.total_infracoes, 0)) * 100 AS variacao
-FROM totais_mes_atual t1, totais_mes_passado t2;
+FROM totais_mes_atual t1
+JOIN totais_mes_passado t2
+  ON t1.id_unidade = t2.id_unidade
+ AND t1.id_segmento = t2.id_segmento
+ AND t1.id_localidade = t2.id_localidade;
 
 
 CREATE VIEW vw_ocorrencias_por_tipo (
