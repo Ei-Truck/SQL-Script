@@ -42,6 +42,8 @@ drop procedure if exists prc_atualiza_unidade();
 drop procedure if exists prc_atualiza_analista();
 drop procedure if exists prc_atualiza_administrador();
 drop function if exists fn_atualizar_dau();
+drop function if exists fn_log_infracao();
+drop function if exists fn_log_motorista();
 
 
 -- =============================
@@ -264,6 +266,31 @@ CREATE TABLE lg_login_usuario (
 CREATE TABLE tb_daily_active_users (
     data         DATE PRIMARY KEY,
     qtd_usuarios INT DEFAULT 0
+);
+
+-- LOG de alterações em Motoristas
+CREATE TABLE lg_tb_motorista (
+    id_log        SERIAL PRIMARY KEY,
+    id_motorista  INTEGER,
+    cpf_old       VARCHAR(15),
+    cpf_new       VARCHAR(15),
+    nome_old      VARCHAR(150),
+    nome_new      VARCHAR(150),
+    acao          VARCHAR(10), -- INSERT | UPDATE | DELETE
+    dt_log        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- LOG de alterações em Infrações
+CREATE TABLE lg_tb_infracao (
+    id_log              SERIAL PRIMARY KEY,
+    id_infracao         INTEGER,
+    id_motorista_old    INTEGER,
+    id_motorista_new    INTEGER,
+    id_tipo_infracao_old INTEGER,
+    id_tipo_infracao_new INTEGER,
+    acao                VARCHAR(10),
+    dt_log              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =============================
@@ -849,6 +876,47 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION fn_log_motorista()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO lg_tb_motorista (id_motorista, cpf_new, nome_new, acao)
+        VALUES (NEW.id, NEW.cpf, NEW.nome_completo, 'INSERT');
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO lg_tb_motorista (id_motorista, cpf_old, cpf_new, nome_old, nome_new, acao)
+        VALUES (OLD.id, OLD.cpf, NEW.cpf, OLD.nome_completo, NEW.nome_completo, 'UPDATE');
+
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO lg_tb_motorista (id_motorista, cpf_old, nome_old, acao)
+        VALUES (OLD.id, OLD.cpf, OLD.nome_completo, 'DELETE');
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_log_infracao()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO lg_tb_infracao (id_infracao, id_motorista_new, id_tipo_infracao_new, acao)
+        VALUES (NEW.id, NEW.id_motorista, NEW.id_tipo_infracao, 'INSERT');
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO lg_tb_infracao (id_infracao, id_motorista_old, id_motorista_new, id_tipo_infracao_old, id_tipo_infracao_new, acao)
+        VALUES (NEW.id, OLD.id_motorista, NEW.id_motorista, OLD.id_tipo_infracao, NEW.id_tipo_infracao, 'UPDATE');
+
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO lg_tb_infracao (id_infracao, id_motorista_old, id_tipo_infracao_old, acao)
+        VALUES (OLD.id, OLD.id_motorista, OLD.id_tipo_infracao, 'DELETE');
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- =============================
 -- TRIGGERS
 -- =============================
@@ -858,7 +926,15 @@ AFTER INSERT ON lg_login_usuario
 FOR EACH ROW
 EXECUTE FUNCTION fn_atualizar_dau();
 
+CREATE TRIGGER trg_log_motorista
+AFTER INSERT OR UPDATE OR DELETE ON tb_motorista
+FOR EACH ROW
+EXECUTE FUNCTION fn_log_motorista();
 
+CREATE TRIGGER trg_log_infracao
+AFTER INSERT OR UPDATE OR DELETE ON tb_infracao
+FOR EACH ROW
+EXECUTE FUNCTION fn_log_infracao();
 
 -- =============================
 -- ÍNDICES
