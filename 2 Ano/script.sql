@@ -302,31 +302,30 @@ GROUP BY v.id, c.placa, v.dt_hr_inicio, v.km_viagem, v.was_analyzed, s.id, u.id,
 order by v.id;
 
 
-CREATE VIEW vw_visao_basica_viagem_info (
+CREATE OR REPLACE VIEW vw_visao_basica_viagem_info (
     id_viagem,
     placa_caminhao,
     data_inicio_viagem,
     data_fim_viagem,
-    km_viagem
-) AS
+    km_viagem,
+    segmento
+    ) AS
 SELECT
     v.id            AS id_viagem,
     c.placa         AS placa_caminhao,
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
-    v.km_viagem     AS km_viagem
+    v.km_viagem     AS km_viagem,
+    s.nome AS segmento
 FROM tb_viagem v
-JOIN tb_infracao o            ON o.id_viagem = v.id
-JOIN tb_motorista m          ON m.id = o.id_motorista
-JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
-JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
-JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
-JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
-JOIN tb_unidade u            ON u.id = m.id_unidade
-JOIN tb_segmento s           ON s.id = m.id_unidade
-JOIN tb_caminhao c           ON c.id = v.id_caminhao
-JOIN tb_localidade l on u.id_localidade = l.id
-GROUP BY v.id, c.id
+         JOIN tb_infracao o            ON o.id_viagem = v.id
+         JOIN tb_motorista m          ON m.id = o.id_motorista
+         JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
+         JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
+         JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
+         JOIN tb_caminhao c           ON c.id = v.id_caminhao
+         JOIN tb_segmento s           ON s.id = c.id_segmento
+GROUP BY v.id, c.id, s.nome
 ORDER BY v.id;
 
 CREATE VIEW vw_visao_basica_viagem_motorista_info (
@@ -339,7 +338,8 @@ CREATE VIEW vw_visao_basica_viagem_motorista_info (
     id_localidade,
     nome_motorista,
     risco_motorista,
-    url_midia_concatenada
+    url_midia_concatenada,
+    url_foto_motorista
 ) AS
 SELECT
     v.id            AS id_viagem,
@@ -351,7 +351,8 @@ SELECT
     l.id            AS id_localidade,
     m.nome_completo AS nome_motorista,
     tr.nome         AS risco_motorista,
-    mc.url          AS url_midia_concatenada
+    mc.url          AS url_midia_concatenada,
+    m.url_foto      AS url_foto_motorista
 FROM tb_viagem v
 JOIN tb_infracao o            ON o.id_viagem = v.id
 JOIN tb_motorista m          ON m.id = o.id_motorista
