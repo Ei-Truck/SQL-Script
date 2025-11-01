@@ -110,7 +110,7 @@ INSERT INTO tb_cargo (nome) VALUES
 INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, url_foto) VALUES
     ('123.456.789-09', 1, 1, '2018-05-10', 'João da Silva', '+11998877666', 'joao.silva@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 1, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/1/profile_1.jpg');
 -- 7.1) USUARIOS FAKE
-INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargom, url_foto) VALUES
+INSERT INTO tb_usuario (cpf, id_unidade, id_perfil, dt_contratacao, nome_completo, telefone, email, hash_senha, id_cargo, url_foto) VALUES
     ('987.654.321-00', 2, 1, '2019-02-15', 'Maria Oliveira', '+11554433222', 'maria.oliveira@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/no_profile.svg'),
     ('321.654.987-01', 3, 2, '2017-07-22', 'Carlos Souza', '+11223344555', 'carlos.souza@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/no_profile.svg'),
     ('111.222.333-96', 4, 3, '2020-01-10', 'Fernanda Lima', '+11567788999', 'fernanda.lima@empresa.com', '$2a$12$bsiGyE38lzmLyZNG701O7OLP8HkS106s.KMrofJVsYwta/1bowsOK', 2, 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/no_profile.svg'),
