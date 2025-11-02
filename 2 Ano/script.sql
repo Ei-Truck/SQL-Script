@@ -353,7 +353,6 @@ ORDER BY v.id;
 CREATE VIEW vw_visao_basica_viagem_motorista_info (
    id_viagem,
    id_motorista,
-   id_segmento,
    id_unidade,
    unidade,
    id_localidade,
@@ -379,8 +378,8 @@ FROM tb_viagem v
          FULL JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
          JOIN tb_unidade u            ON u.id = m.id_unidade
          JOIN tb_localidade l on u.id_localidade = l.id
-GROUP BY v.id, u.id,  l.id, m.id, tr.nome, mc.url
-ORDER BY v.id;
+GROUP BY v.id, u.id, l.id, m.id, tr.nome, mc.url
+ORDER BY v.id;
 
 
 CREATE VIEW vw_ocorrencia_por_viagem (
