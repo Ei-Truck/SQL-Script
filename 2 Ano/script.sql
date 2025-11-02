@@ -134,7 +134,7 @@ CREATE TABLE tb_usuario (
     telefone         VARCHAR(15) NOT NULL UNIQUE,
     email            VARCHAR(150) NOT NULL UNIQUE,
     hash_senha       VARCHAR(100) NOT NULL,
-    url_foto         VARCHAR(255) DEFAULT 'Sem foto',
+    url_foto         VARCHAR(255) DEFAULT 'https://eitruck.s3.sa-east-1.amazonaws.com/perfil/no_profile.svg',
     id_cargo         INTEGER NOT NULL REFERENCES tb_cargo,
     transaction_made VARCHAR(20),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
