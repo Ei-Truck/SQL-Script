@@ -351,23 +351,20 @@ GROUP BY v.id, c.id, s.nome
 ORDER BY v.id;
 
 CREATE VIEW vw_visao_basica_viagem_motorista_info (
-    id_viagem,
-    id_motorista,
-    id_segmento,
-    segmento,
-    id_unidade,
-    unidade,
-    id_localidade,
-    nome_motorista,
-    risco_motorista,
-    url_midia_concatenada,
-    url_foto_motorista
-) AS
+   id_viagem,
+   id_motorista,
+   id_segmento,
+   id_unidade,
+   unidade,
+   id_localidade,
+   nome_motorista,
+   risco_motorista,
+   url_midia_concatenada,
+   url_foto_motorista
+    ) AS
 SELECT
     v.id            AS id_viagem,
     m.id            AS id_motorista,
-    s.id            AS id_segmento,
-    s.nome          AS segmento,
     u.id            AS id_unidade,
     u.nome          AS unidade,
     l.id            AS id_localidade,
@@ -376,18 +373,14 @@ SELECT
     mc.url          AS url_midia_concatenada,
     m.url_foto      AS url_foto_motorista
 FROM tb_viagem v
-JOIN tb_infracao o            ON o.id_viagem = v.id
-JOIN tb_motorista m          ON m.id = o.id_motorista
-JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
-JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
-JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
-FULL JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
-JOIN tb_unidade u            ON u.id = m.id_unidade
-JOIN tb_segmento s           ON s.id = m.id_unidade
-JOIN tb_caminhao c           ON c.id = v.id_caminhao
-JOIN tb_localidade l on u.id_localidade = l.id
-GROUP BY v.id, c.id, s.id, u.id,  l.id, m.id, tr.nome, mc.url
-ORDER BY v.id;
+         JOIN tb_infracao o            ON o.id_viagem = v.id
+         jOIN tb_motorista m          ON m.id = o.id_motorista
+         JOIN tb_tipo_risco tr        ON m.id_tipo_risco = tr.id
+         FULL JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
+         JOIN tb_unidade u            ON u.id = m.id_unidade
+         JOIN tb_localidade l on u.id_localidade = l.id
+GROUP BY v.id, u.id,  l.id, m.id, tr.nome, mc.url
+ORDER BY v.id;
 
 
 CREATE VIEW vw_ocorrencia_por_viagem (
