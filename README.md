@@ -10,6 +10,11 @@ O script inclui:
 
 ---
 
+## 🛴 Foto do Modelo
+
+<img width="1265" height="1033" alt="image" src="https://github.com/user-attachments/assets/b28d16d7-77fd-4a58-9d91-21d46093a1db" />
+
+
 ## 🧱 Modelo Lógico (Visão Geral)
 
 A base foi organizada em **entidades principais**:
