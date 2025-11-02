@@ -343,13 +343,8 @@ SELECT
     v.dt_hr_inicio  AS data_inicio_viagem,
     v.dt_hr_fim     AS data_fim_viagem,
     v.km_viagem     AS km_viagem,
-    s.nome AS segmento
+    s.nome          AS segmento
 FROM tb_viagem v
-         JOIN tb_infracao o            ON o.id_viagem = v.id
-         JOIN tb_motorista m          ON m.id = o.id_motorista
-         JOIN tb_tipo_infracao t      ON t.id = o.id_tipo_infracao
-         JOIN tb_tipo_gravidade tg    ON t.id_tipo_gravidade = tg.id
-         JOIN tb_midia_concatenada mc ON mc.id_motorista = m.id AND mc.id_viagem = v.id
          JOIN tb_caminhao c           ON c.id = v.id_caminhao
          JOIN tb_segmento s           ON s.id = c.id_segmento
 GROUP BY v.id, c.id, s.nome
