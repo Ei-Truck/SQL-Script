@@ -23,6 +23,8 @@ drop table if exists tb_segmento cascade;
 drop table if exists tb_tipo_gravidade cascade;
 drop table if exists lg_login_usuario cascade;
 drop table if exists tb_daily_active_users cascade;
+drop table if exists lg_tb_motorista cascade;
+drop table if exists lg_tb_infracao cascade;
 drop view if exists vw_motorista_pontuacao_mensal;
 drop view if exists vw_relatorio_simples_viagem;
 drop view if exists vw_visao_basica_viagem_info;
